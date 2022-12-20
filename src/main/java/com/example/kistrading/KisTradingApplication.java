@@ -9,4 +9,5 @@ public class KisTradingApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(KisTradingApplication.class, args);
 	}
+
 }
