@@ -1,0 +1,13 @@
+version: "3.7"
+
+services:
+  app:
+    container_name: mysql_for_kis
+    image: mysql
+    ports:
+      - 3306:3306
+    volumes:
+        - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: test

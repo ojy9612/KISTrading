@@ -36,5 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
-# resources
+# my
 /src/main/resources/application.yaml
+/mysql/
