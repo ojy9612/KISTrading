@@ -30,7 +30,7 @@ public class TokenService {
     private String appsecert;
 
     @Transactional
-    private Token createToken(){
+    public Token createToken() {
         Map<String, String> reqBody = new HashMap<>();
 
         reqBody.put("grant_type", "client_credentials");
