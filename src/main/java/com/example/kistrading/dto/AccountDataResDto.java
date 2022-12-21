@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class AccountDataResDto {
     @JsonProperty("msg1")
     private String msg1;
@@ -33,45 +33,60 @@ public class AccountDataResDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class StockInfo {
-        @JsonProperty("pdno")
-        private String stockCode;
-        @JsonProperty("prdt_name")
-        private String stockName;
-        @JsonProperty("trad_dvsn_name")
-        private String tradDvsn;
-        @JsonProperty("bfdy_buy_qty")
-        private String bfdyBuy;
-        @JsonProperty("bfdy_sll_qty")
-        private String bfdySell;
-        @JsonProperty("thdt_buyqty")
-        private String nedyBuy;
-        @JsonProperty("thdt_sll_qty")
-        private String nedySell;
-        @JsonProperty("hldg_qty")
-        private String amount;
-        @JsonProperty("ord_psbl_qty")
-        private String canOrderAmount;
-        @JsonProperty("pchs_avg_pric")
-        private String avgPrice;
-        @JsonProperty("pchs_amt")
-        private String personalTotalBuyPrice;
-        @JsonProperty("prpr")
-        private String nowPrice;
-        @JsonProperty("evlu_amt")
-        private String evluPrice;
-        @JsonProperty("evlu_pfls_amt")
-        private String evluPflsAmount;
-        @JsonProperty("evlu_pfls_rt")
-        private String evluPflsRate;
-        @JsonProperty("evlu_erng_rt")
-        private String evluEarnRate;
-        @JsonProperty("fltt_rt")
-        private String rate;
-        @JsonProperty("bfdy_cprs_icdc")
-        private String bfdyRate;
+        @JsonProperty("stck_loan_unpr")
+        private String stckLoanUnpr;
+        @JsonProperty("sbst_pric")
+        private String sbstPric;
+        @JsonProperty("grta_rt_name")
+        private String grtaRtName;
         @JsonProperty("item_mgna_rt_name")
-        private String stockMgnaName;
+        private String itemMgnaRtName;
+        @JsonProperty("bfdy_cprs_icdc")
+        private String bfdyCprsIcdc;
+        @JsonProperty("fltt_rt")
+        private String flttRt;
+        @JsonProperty("expd_dt")
+        private String expdDt;
+        @JsonProperty("stln_slng_chgs")
+        private String stlnSlngChgs;
+        @JsonProperty("loan_amt")
+        private String loanAmt;
+        @JsonProperty("loan_dt")
+        private String loanDt;
+        @JsonProperty("evlu_erng_rt")
+        private String evluErngRt;
+        @JsonProperty("evlu_pfls_rt")
+        private String evluPflsRt;
+        @JsonProperty("evlu_pfls_amt")
+        private String evluPflsAmt;
+        @JsonProperty("evlu_amt")
+        private String evluAmt;
+        @JsonProperty("prpr")
+        private String prpr;
+        @JsonProperty("pchs_amt")
+        private String pchsAmt;
+        @JsonProperty("pchs_avg_pric")
+        private String pchsAvgPric;
+        @JsonProperty("ord_psbl_qty")
+        private String ordPsblQty;
+        @JsonProperty("hldg_qty")
+        private String hldgQty;
+        @JsonProperty("thdt_sll_qty")
+        private String thdtSllQty;
+        @JsonProperty("thdt_buyqty")
+        private String thdtBuyqty;
+        @JsonProperty("bfdy_sll_qty")
+        private String bfdySllQty;
+        @JsonProperty("bfdy_buy_qty")
+        private String bfdyBuyQty;
+        @JsonProperty("trad_dvsn_name")
+        private String tradDvsnName;
+        @JsonProperty("prdt_name")
+        private String prdtName;
+        @JsonProperty("pdno")
+        private String pdno;
     }
+
 
     @Getter
     @Builder
@@ -126,7 +141,6 @@ public class AccountDataResDto {
         private String nxdyExccAmt;
         @JsonProperty("dnca_tot_amt")
         private String dncaTotAmt;
-
     }
 
 }
