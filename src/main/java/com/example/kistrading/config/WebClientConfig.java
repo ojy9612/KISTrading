@@ -10,11 +10,6 @@ public class WebClientConfig {
 
     @Value("${kis.domain.train}")
     private String domain;
-    @Value("${kis.train.appkey}")
-    private String appkey;
-    @Value("${kis.train.appsecret}")
-    private String appsecert;
-
 
     @Bean
     public WebClient webClient(){

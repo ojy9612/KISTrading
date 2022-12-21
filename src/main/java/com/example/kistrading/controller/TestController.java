@@ -3,7 +3,9 @@ package com.example.kistrading.controller;
 import com.example.kistrading.entity.Token;
 import com.example.kistrading.repository.TokenRepository;
 import com.example.kistrading.service.WebClientConnector;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -24,16 +26,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TestController {
 
-    @Value("${kis.domain.train}")
-    private String train;
     @Value("${kis.train.appkey}")
     private String appkey;
     @Value("${kis.train.appsecret}")
     private String appsecert;
 
 
-    private final WebClientConnector webClientConnector;
+    private final WebClientConnector<String> webClientConnectorString;
     private final TokenRepository tokenRepository;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/test1")
     @Transactional
@@ -41,15 +42,20 @@ public class TestController {
 
 
         Map<String, String> reqBody = new HashMap<>();
-        MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
-        MultiValueMap<String, String> reqHeader = new LinkedMultiValueMap<>();
 
         reqBody.put("grant_type", "client_credentials");
         reqBody.put("appkey", appkey);
         reqBody.put("appsecret", appsecert);
 
-        JsonNode jsonNode = webClientConnector.connectKIS(HttpMethod.POST, "/oauth2/tokenP",
-                reqHeader, reqParam, reqBody);
+        JsonNode jsonNode;
+        try {
+            jsonNode = objectMapper.readTree(
+                    webClientConnectorString.connect(HttpMethod.POST, "/oauth2/tokenP",
+                            null, null, reqBody, String.class)
+            );
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         if (jsonNode.get("error_code") != null) {
             return jsonNode;
@@ -69,22 +75,24 @@ public class TestController {
 
 
     @GetMapping("/test2/{token}")
-    public String test2(@PathVariable String token) {
+    public JsonNode test2(@PathVariable String token) {
 
         Map<String, String> reqBody = new HashMap<>();
-        MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
-        MultiValueMap<String, String> reqHeader = new LinkedMultiValueMap<>();
 
         reqBody.put("token", token);
         reqBody.put("appkey", appkey);
         reqBody.put("appsecret", appsecert);
 
 
-        JsonNode test = webClientConnector.connectKIS(HttpMethod.POST, "/oauth2/revokeP",
-                reqHeader, reqParam, reqBody);
+        JsonNode test;
+        try {
+            test = objectMapper.readTree(webClientConnectorString.connect(HttpMethod.POST, "/oauth2/revokeP",
+                    null, null, reqBody, String.class));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
-
-        return null;
+        return test;
 
 
     }
@@ -92,7 +100,6 @@ public class TestController {
     @GetMapping("/test3")
     @Transactional
     public JsonNode test3() {
-
 
         Map<String, String> reqBody = new HashMap<>();
         MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
@@ -118,8 +125,13 @@ public class TestController {
         reqParam.add("CTX_AREA_NK100", "");
 
 
-        JsonNode jsonNode = webClientConnector.connectKIS(HttpMethod.GET, "/uapi/domestic-stock/v1/trading/inquire-balance",
-                reqHeader, reqParam, reqBody);
+        JsonNode jsonNode;
+        try {
+            jsonNode = objectMapper.readTree(webClientConnectorString.connect(HttpMethod.GET, "/uapi/domestic-stock/v1/trading/inquire-balance",
+                    reqHeader, reqParam, reqBody, String.class));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
 
         if (jsonNode.get("error_code") != null) {
             return jsonNode;
