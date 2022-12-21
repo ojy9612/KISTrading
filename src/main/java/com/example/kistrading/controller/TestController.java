@@ -1,7 +1,8 @@
 package com.example.kistrading.controller;
 
-import com.example.kistrading.entity.Token;
 import com.example.kistrading.repository.TokenRepository;
+import com.example.kistrading.service.InformationService;
+import com.example.kistrading.service.TokenService;
 import com.example.kistrading.service.WebClientConnector;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,16 +11,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -34,43 +30,14 @@ public class TestController {
 
     private final WebClientConnector<String> webClientConnectorString;
     private final TokenRepository tokenRepository;
+    private final TokenService tokenService;
+    private final InformationService informationService;
     private final ObjectMapper objectMapper;
 
     @GetMapping("/test1")
     @Transactional
-    public JsonNode test1() {
-
-
-        Map<String, String> reqBody = new HashMap<>();
-
-        reqBody.put("grant_type", "client_credentials");
-        reqBody.put("appkey", appkey);
-        reqBody.put("appsecret", appsecert);
-
-        JsonNode jsonNode;
-        try {
-            jsonNode = objectMapper.readTree(
-                    webClientConnectorString.connect(HttpMethod.POST, "/oauth2/tokenP",
-                            null, null, reqBody, String.class)
-            );
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (jsonNode.get("error_code") != null) {
-            return jsonNode;
-        }
-
-        Token token = Token.builder()
-                .token("Bearer " + jsonNode.get("access_token").asText())
-                .expiredDate(LocalDateTime.parse(
-                        jsonNode.get("access_token_token_expired").asText(),
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss")))
-                .build();
-
-        tokenRepository.save(token);
-
-        return jsonNode;
+    public String test1() {
+        return tokenService.getAndDeleteToken();
     }
 
 
@@ -99,54 +66,8 @@ public class TestController {
 
     @GetMapping("/test3")
     @Transactional
-    public JsonNode test3() {
-
-        Map<String, String> reqBody = new HashMap<>();
-        MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
-        MultiValueMap<String, String> reqHeader = new LinkedMultiValueMap<>();
-
-        List<Token> all = tokenRepository.findAll();
-
-        reqHeader.add("authorization", all.get(0).getToken());
-        reqHeader.add("appkey", appkey);
-        reqHeader.add("appsecret", appsecert);
-        reqHeader.add("tr_id", "VTTC8434R");
-
-        reqParam.add("CANO", "50076882");
-        reqParam.add("ACNT_PRDT_CD", "01");
-        reqParam.add("AFHR_FLPR_YN", "N");
-        reqParam.add("OFL_YN", "");
-        reqParam.add("INQR_DVSN", "01");
-        reqParam.add("UNPR_DVSN", "01");
-        reqParam.add("FUND_STTL_ICLD_YN", "N");
-        reqParam.add("FNCG_AMT_AUTO_RDPT_YN", "N");
-        reqParam.add("PRCS_DVSN", "01");
-        reqParam.add("CTX_AREA_FK100", "");
-        reqParam.add("CTX_AREA_NK100", "");
-
-
-        JsonNode jsonNode;
-        try {
-            jsonNode = objectMapper.readTree(webClientConnectorString.connect(HttpMethod.GET, "/uapi/domestic-stock/v1/trading/inquire-balance",
-                    reqHeader, reqParam, reqBody, String.class));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-        if (jsonNode.get("error_code") != null) {
-            return jsonNode;
-        }
-
-        Token token = Token.builder()
-                .token(jsonNode.get("access_token").asText())
-                .expiredDate(LocalDateTime.parse(
-                        jsonNode.get("access_token_token_expired").asText(),
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss")))
-                .build();
-
-        tokenRepository.save(token);
-
-        return jsonNode;
+    public void test3() {
+        informationService.getAccountData();
     }
 
 
