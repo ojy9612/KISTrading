@@ -1,0 +1,18 @@
+### 현금 주문 api
+POST https://openapivts.koreainvestment.com:29443/uapi/domestic-stock/v1/trading/order-cash
+authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0b2tlbiIsImF1ZCI6IjkwODc4ODA2LTA4YjEtNDBjNy04OGQ1LTY5M2VmOTA2NjJkZSIsImlzcyI6InVub2d3IiwiZXhwIjoxNjcxNjczMjc2LCJpYXQiOjE2NzE1ODY4NzYsImp0aSI6IlBTWTRvY1RaMzBuOHlyVVNaUWRSQU1BT2VpTkx4OTY4TVBVNyJ9.ZoXBCK--ncoSB-pMHe9Llx7vYb0uDXclmdZOOVEv0jcgh72f-IBMGWEyGaCfLWTcY9e8zcuyv4LCHqyHodfagw
+appkey: PSY4ocTZ30n8yrUSZQdRAMAOeiNLx968MPU7
+appsecret: WZS1NeUe7zB2dVJMnjXb1rGq9CNOqPlx7gVoumhWczxyulXpp/vSARpOLdl3Tj4Xp65gQJdUDf6vcndv+6t7oqS6509XooaRnWoMYDejhL6Sut1EzNMzWxgWHepeGyKbDtatz6kJYKwPIXx5a0xXM7XK/aOIEfj/5cgmsrn4kUaZDc4ZvKQ=
+tr_id: VTTC0802U
+
+{
+    "CANO": "50076882",
+    "ACNT_PRDT_CD": "01",
+    "PDNO": "007680",
+    "ORD_DVSN": "01",
+    "ORD_QTY": "10",
+    "ORD_UNPR": "0"
+}
+
+### localTest
+GET localhost:8080/test4

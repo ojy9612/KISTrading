@@ -15,15 +15,27 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class InformationService {
 
-    private final WebClientConnector<AccountDataResDto> webClientConnectorString;
+    private final WebClientConnector<AccountDataResDto> webClientConnectorDto;
     private final TokenService tokenService;
 
     @Value("${kis.train.appkey}")
-    private String appkey;
+    private String trainAppkey;
     @Value("${kis.train.appsecret}")
-    private String appsecert;
+    private String trainAppsecert;
+    @Value("${kis.train.account}")
+    private String trainAccountNum;
 
-    public void getAccountData(){
+    @Value("${kis.real.appkey}")
+    private String realAppkey;
+    @Value("${kis.real.appsecret}")
+    private String realAppsecert;
+    @Value("${kis.real.account}")
+    private String realAccountNum;
+
+    @Value("${kis.mode}")
+    private String mode;
+
+    public void getAccountData() {
 
         Map<String, String> reqBody = new HashMap<>();
         MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
@@ -32,11 +44,11 @@ public class InformationService {
         String tokenString = tokenService.getAndDeleteToken();
 
         reqHeader.add("authorization", tokenString);
-        reqHeader.add("appkey", appkey);
-        reqHeader.add("appsecret", appsecert);
-        reqHeader.add("tr_id", "VTTC8434R");
+        reqHeader.add("appkey", mode.equals("real") ? realAppkey : trainAppkey);
+        reqHeader.add("appsecret", mode.equals("real") ? realAppsecert : trainAppsecert);
+        reqHeader.add("tr_id", mode.equals("real") ? "TTTC8434R" : "VTTC8434R");
 
-        reqParam.add("CANO", "50076882");
+        reqParam.add("CANO", mode.equals("real") ? realAccountNum : trainAccountNum);
         reqParam.add("ACNT_PRDT_CD", "01");
         reqParam.add("AFHR_FLPR_YN", "N");
         reqParam.add("OFL_YN", "");
@@ -49,7 +61,7 @@ public class InformationService {
         reqParam.add("CTX_AREA_NK100", "");
 
 
-        AccountDataResDto connect = webClientConnectorString.connect(HttpMethod.GET, "/uapi/domestic-stock/v1/trading/inquire-balance",
+        AccountDataResDto connect = webClientConnectorDto.connect(HttpMethod.GET, "/uapi/domestic-stock/v1/trading/inquire-balance",
                 reqHeader, reqParam, reqBody, AccountDataResDto.class);
 
         System.out.println(connect);

@@ -3,6 +3,7 @@ package com.example.kistrading.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -27,8 +28,8 @@ public class WebClientConnector<T> {
      * @param uri        base url 을 제외 한 uri
      * @param reqHeader  header 정보, null 을 넣어도 됨
      * @param reqParam   query parameters 정보, null 을 넣어도 됨
-     * @param reqBody    request body 정보, null 을 넣어도 됨
-     * @param classType  Generic class type (ex. String.class)
+     * @param reqBody    request body 정보, null 을 넣어도음됨
+     * @param classType  Generic class type, T.class 는 사용 할 수 없음 (ex. String.class)
      * @return response 를 JsonNode 로 리턴
      */
     public T connect(HttpMethod methodType, String uri, MultiValueMap<String, String> reqHeader,
@@ -46,7 +47,7 @@ public class WebClientConnector<T> {
                             .path(uri)
                             .queryParams(params)
                             .build())
-                    .headers(httpHeaders -> httpHeaders.addAll(headers))
+                    .headers(httpHeaders -> new HttpHeaders(headers))
                     .bodyValue(requestBodyJson)
                     .exchangeToMono(clientResponse -> clientResponse.toEntity(classType))
                     .block();

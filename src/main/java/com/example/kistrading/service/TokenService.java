@@ -1,6 +1,7 @@
 package com.example.kistrading.service;
 
 import com.example.kistrading.entity.Token;
+import com.example.kistrading.entity.em.TradeMode;
 import com.example.kistrading.repository.TokenRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -25,17 +26,23 @@ public class TokenService {
     private final WebClientConnector<String> webClientConnectorString;
 
     @Value("${kis.train.appkey}")
-    private String appkey;
+    private String trainAppkey;
     @Value("${kis.train.appsecret}")
-    private String appsecert;
+    private String trainAppsecert;
+    @Value("${kis.real.appkey}")
+    private String realAppkey;
+    @Value("${kis.real.appsecret}")
+    private String realAppsecert;
+    @Value("${kis.mode}")
+    private String mode;
 
     @Transactional
     public Token createToken() {
         Map<String, String> reqBody = new HashMap<>();
 
         reqBody.put("grant_type", "client_credentials");
-        reqBody.put("appkey", appkey);
-        reqBody.put("appsecret", appsecert);
+        reqBody.put("appkey", mode.equals("real") ? realAppkey : trainAppkey);
+        reqBody.put("appsecret", mode.equals("real") ? realAppsecert : trainAppsecert);
 
         JsonNode jsonNode;
         try {
@@ -48,10 +55,11 @@ public class TokenService {
         }
 
         Token token = Token.builder()
-                .token("Bearer " + jsonNode.get("access_token").asText())
+                .tokenValue("Bearer " + jsonNode.get("access_token").asText())
                 .expiredDate(LocalDateTime.parse(
                         jsonNode.get("access_token_token_expired").asText(),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss")))
+                .mode(TradeMode.getTradeMode(mode))
                 .build();
 
         return tokenRepository.save(token);
@@ -64,14 +72,16 @@ public class TokenService {
         Token result = null;
 
         for (Token token : tokenList) {
-            if (token.getExpiredDate().minusHours(12).isBefore(LocalDateTime.now())){
-                tokenRepository.delete(token);
-            } else {
-                result = token;
+            if (token.getMode().equals(TradeMode.getTradeMode(mode))) {
+                if (token.getExpiredDate().minusHours(12).isBefore(LocalDateTime.now())) {
+                    tokenRepository.delete(token);
+                } else {
+                    result = token;
+                }
             }
         }
 
-        return result != null ? result.getToken() : this.createToken().getToken();
+        return result != null ? result.getTokenValue() : this.createToken().getTokenValue();
     }
 
 }

@@ -8,15 +8,19 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    @Value("${kis.domain.train}")
-    private String domain;
+    @Value("${kis.train.domain}")
+    private String trainDomain;
+    @Value("${kis.real.domain}")
+    private String realDomain;
+    @Value("${kis.mode}")
+    private String mode;
 
     @Bean
-    public WebClient webClient(){
+    public WebClient webClient() {
 
         return WebClient.builder()
-                .baseUrl(domain)
-                .defaultHeader("Content-Type", "application/json")
+                .baseUrl(mode.equals("real") ? realDomain : trainDomain)
+                .defaultHeader("Content-Type", "application/json; charset=utf-8")
                 .build();
     }
 }
