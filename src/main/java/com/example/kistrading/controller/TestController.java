@@ -70,5 +70,4 @@ public class TestController {
         tradeService.orderStock(OrderType.BUY, "007680", "0", "10");
     }
 
-
 }

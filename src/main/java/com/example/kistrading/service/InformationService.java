@@ -25,14 +25,14 @@ public class InformationService {
 
         Map<String, String> reqBody = new HashMap<>();
         MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
-        MultiValueMap<String, String> reqHeader = new LinkedMultiValueMap<>();
+        Map<String, String> reqHeader = new HashMap<>();
 
         String tokenString = tokenService.getAndDeleteToken();
 
-        reqHeader.add("authorization", tokenString);
-        reqHeader.add("appkey", pm.getAppKey());
-        reqHeader.add("appsecret", pm.getAppSecret());
-        reqHeader.add("tr_id", pm.getMode().equals(TradeMode.REAL) ? "TTTC8434R" : "VTTC8434R");
+        reqHeader.put("authorization", tokenString);
+        reqHeader.put("appkey", pm.getAppKey());
+        reqHeader.put("appsecret", pm.getAppSecret());
+        reqHeader.put("tr_id", pm.getMode().equals(TradeMode.REAL) ? "TTTC8434R" : "VTTC8434R");
 
         reqParam.add("CANO", pm.getAccountNum());
         reqParam.add("ACNT_PRDT_CD", "01");

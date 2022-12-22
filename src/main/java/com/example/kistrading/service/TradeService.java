@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +16,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TradeService {
     private final WebClientConnector<OrderStockResDto> webClientConnectorDto;
-    private final WebClientConnector<String> webClientConnectorString;
     private final TokenService tokenService;
 
     private final PropertiesMapping pm;
@@ -28,15 +25,15 @@ public class TradeService {
                            String orderPrice, String orderAmount) {
 
         Map<String, String> reqBody = new HashMap<>();
-        MultiValueMap<String, String> reqHeader = new LinkedMultiValueMap<>();
+        Map<String, String> reqHeader = new HashMap<>();
 
-        reqHeader.add("authorization", tokenService.getAndDeleteToken());
-        reqHeader.add("appkey", pm.getAppKey());
-        reqHeader.add("appsecret", pm.getAppSecret());
+        reqHeader.put("authorization", tokenService.getAndDeleteToken());
+        reqHeader.put("appkey", pm.getAppKey());
+        reqHeader.put("appsecret", pm.getAppSecret());
         if (orderType.getName().equals("BUY")) {
-            reqHeader.add("tr_id", pm.getMode().equals(TradeMode.REAL) ? "TTTC0802U" : "VTTC0802U");
+            reqHeader.put("tr_id", pm.getMode().equals(TradeMode.REAL) ? "TTTC0802U" : "VTTC0802U");
         } else if (orderType.getName().equals("SELL")) {
-            reqHeader.add("tr_id", pm.getMode().equals(TradeMode.REAL) ? "TTTC0801U" : "VTTC0801U");
+            reqHeader.put("tr_id", pm.getMode().equals(TradeMode.REAL) ? "TTTC0801U" : "VTTC0801U");
         }
 
         reqBody.put("CANO", pm.getAccountNum());
@@ -46,13 +43,12 @@ public class TradeService {
         reqBody.put("ORD_QTY", orderAmount);
         reqBody.put("ORD_UNPR", orderPrice);
 
-//        OrderStockResDto response = webClientConnectorDto.connect(HttpMethod.POST, "/uapi/domestic-stock/v1/trading/order-cash",
-//                reqHeader, null, reqBody, OrderStockResDto.class);
-        String asd = webClientConnectorString.connect(HttpMethod.POST, "/uapi/domestic-stock/v1/trading/order-cash",
-                reqHeader, null, reqBody, String.class);
+        OrderStockResDto response = webClientConnectorDto.connect(HttpMethod.POST, "/uapi/domestic-stock/v1/trading/order-cash",
+                reqHeader, null, reqBody, OrderStockResDto.class);
 
-//        System.out.println(response);
-        System.out.println(asd);
+
+        System.out.println(response);
+
     }
 
 }

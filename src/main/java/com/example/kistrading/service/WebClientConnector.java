@@ -3,7 +3,6 @@ package com.example.kistrading.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -28,15 +27,15 @@ public class WebClientConnector<T> {
      * @param uri        base url 을 제외 한 uri
      * @param reqHeader  header 정보, null 을 넣어도 됨
      * @param reqParam   query parameters 정보, null 을 넣어도 됨
-     * @param reqBody    request body 정보, null 을 넣어도음됨
+     * @param reqBody    request body 정보, null 을 넣어도 됨
      * @param classType  Generic class type (ex. String.class)
      * @return response 를 JsonNode 로 리턴
      */
-    public T connect(HttpMethod methodType, String uri, MultiValueMap<String, String> reqHeader,
+    public T connect(HttpMethod methodType, String uri, Map<String, String> reqHeader,
                      MultiValueMap<String, String> reqParam, Map<String, String> reqBody, Class<T> classType) {
 
         Map<String, String> body = reqBody != null ? reqBody : new HashMap<>();
-        MultiValueMap<String, String> headers = reqHeader != null ? reqHeader : new LinkedMultiValueMap<>();
+        Map<String, String> headers = reqHeader != null ? reqHeader : new HashMap<>();
         MultiValueMap<String, String> params = reqParam != null ? reqParam : new LinkedMultiValueMap<>();
 
         try {
@@ -47,7 +46,7 @@ public class WebClientConnector<T> {
                             .path(uri)
                             .queryParams(params)
                             .build())
-                    .headers(httpHeaders -> new HttpHeaders(headers))
+                    .headers(httpHeaders -> httpHeaders.setAll(headers))
                     .bodyValue(requestBodyJson)
                     .exchangeToMono(clientResponse -> clientResponse.toEntity(classType))
                     .block();
