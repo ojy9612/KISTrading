@@ -24,7 +24,7 @@ public class TradeService {
     private final PropertiesMapping pm;
 
     @Transactional
-    public void OrderStock(OrderType orderType, String stockCode,
+    public void orderStock(OrderType orderType, String stockCode,
                            String orderPrice, String orderAmount) {
 
         Map<String, String> reqBody = new HashMap<>();

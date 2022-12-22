@@ -23,7 +23,7 @@ import java.util.Map;
 public class TestController {
 
     private final PropertiesMapping pm;
-    
+
     private final WebClientConnector<String> webClientConnectorString;
     private final TokenService tokenService;
     private final TradeService tradeService;
@@ -67,7 +67,7 @@ public class TestController {
 
     @GetMapping("/test4")
     public void test4() {
-        tradeService.OrderStock(OrderType.BUY, "007680", "0", "10");
+        tradeService.orderStock(OrderType.BUY, "007680", "0", "10");
     }
 
 
