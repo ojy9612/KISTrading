@@ -29,7 +29,7 @@ public class WebClientConnector<T> {
      * @param reqHeader  header 정보, null 을 넣어도 됨
      * @param reqParam   query parameters 정보, null 을 넣어도 됨
      * @param reqBody    request body 정보, null 을 넣어도음됨
-     * @param classType  Generic class type, T.class 는 사용 할 수 없음 (ex. String.class)
+     * @param classType  Generic class type (ex. String.class)
      * @return response 를 JsonNode 로 리턴
      */
     public T connect(HttpMethod methodType, String uri, MultiValueMap<String, String> reqHeader,
