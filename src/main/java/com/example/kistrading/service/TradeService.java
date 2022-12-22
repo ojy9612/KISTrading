@@ -47,8 +47,7 @@ public class TradeService {
                 reqHeader, null, reqBody, OrderStockResDto.class);
 
 
-        System.out.println(response);
-
+        System.out.println(response.getRtCd() + response.getMsgCd() + response.getMsg1());
     }
 
 }
