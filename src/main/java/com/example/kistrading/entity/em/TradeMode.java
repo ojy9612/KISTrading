@@ -17,7 +17,7 @@ public enum TradeMode {
                 return tradeMode;
             }
         }
-        return null;
+        throw new IllegalStateException("유효하지 않은 TradeMode 입니다. - " + name);
     }
 
     TradeMode(String name) {

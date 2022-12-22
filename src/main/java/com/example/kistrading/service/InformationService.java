@@ -1,8 +1,9 @@
 package com.example.kistrading.service;
 
+import com.example.kistrading.config.PropertiesMapping;
 import com.example.kistrading.dto.AccountDataResDto;
+import com.example.kistrading.entity.em.TradeMode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -18,22 +19,7 @@ public class InformationService {
     private final WebClientConnector<AccountDataResDto> webClientConnectorDto;
     private final TokenService tokenService;
 
-    @Value("${kis.train.appkey}")
-    private String trainAppkey;
-    @Value("${kis.train.appsecret}")
-    private String trainAppsecert;
-    @Value("${kis.train.account}")
-    private String trainAccountNum;
-
-    @Value("${kis.real.appkey}")
-    private String realAppkey;
-    @Value("${kis.real.appsecret}")
-    private String realAppsecert;
-    @Value("${kis.real.account}")
-    private String realAccountNum;
-
-    @Value("${kis.mode}")
-    private String mode;
+    private final PropertiesMapping pm;
 
     public void getAccountData() {
 
@@ -44,11 +30,11 @@ public class InformationService {
         String tokenString = tokenService.getAndDeleteToken();
 
         reqHeader.add("authorization", tokenString);
-        reqHeader.add("appkey", mode.equals("real") ? realAppkey : trainAppkey);
-        reqHeader.add("appsecret", mode.equals("real") ? realAppsecert : trainAppsecert);
-        reqHeader.add("tr_id", mode.equals("real") ? "TTTC8434R" : "VTTC8434R");
+        reqHeader.add("appkey", pm.getAppKey());
+        reqHeader.add("appsecret", pm.getAppSecret());
+        reqHeader.add("tr_id", pm.getMode().equals(TradeMode.REAL) ? "TTTC8434R" : "VTTC8434R");
 
-        reqParam.add("CANO", mode.equals("real") ? realAccountNum : trainAccountNum);
+        reqParam.add("CANO", pm.getAccountNum());
         reqParam.add("ACNT_PRDT_CD", "01");
         reqParam.add("AFHR_FLPR_YN", "N");
         reqParam.add("OFL_YN", "");

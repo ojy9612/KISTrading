@@ -1,13 +1,12 @@
 package com.example.kistrading.service;
 
+import com.example.kistrading.config.PropertiesMapping;
 import com.example.kistrading.entity.Token;
-import com.example.kistrading.entity.em.TradeMode;
 import com.example.kistrading.repository.TokenRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,24 +24,15 @@ public class TokenService {
     private final ObjectMapper objectMapper;
     private final WebClientConnector<String> webClientConnectorString;
 
-    @Value("${kis.train.appkey}")
-    private String trainAppkey;
-    @Value("${kis.train.appsecret}")
-    private String trainAppsecert;
-    @Value("${kis.real.appkey}")
-    private String realAppkey;
-    @Value("${kis.real.appsecret}")
-    private String realAppsecert;
-    @Value("${kis.mode}")
-    private String mode;
+    private final PropertiesMapping pm;
 
     @Transactional
     public Token createToken() {
         Map<String, String> reqBody = new HashMap<>();
 
         reqBody.put("grant_type", "client_credentials");
-        reqBody.put("appkey", mode.equals("real") ? realAppkey : trainAppkey);
-        reqBody.put("appsecret", mode.equals("real") ? realAppsecert : trainAppsecert);
+        reqBody.put("appkey", pm.getAppKey());
+        reqBody.put("appsecret", pm.getAppSecret());
 
         JsonNode jsonNode;
         try {
@@ -59,7 +49,7 @@ public class TokenService {
                 .expiredDate(LocalDateTime.parse(
                         jsonNode.get("access_token_token_expired").asText(),
                         DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss")))
-                .mode(TradeMode.getTradeMode(mode))
+                .mode(pm.getMode())
                 .build();
 
         return tokenRepository.save(token);
@@ -72,7 +62,7 @@ public class TokenService {
         Token result = null;
 
         for (Token token : tokenList) {
-            if (token.getMode().equals(TradeMode.getTradeMode(mode))) {
+            if (token.getMode().equals(pm.getMode())) {
                 if (token.getExpiredDate().minusHours(12).isBefore(LocalDateTime.now())) {
                     tokenRepository.delete(token);
                 } else {

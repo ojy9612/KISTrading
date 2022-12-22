@@ -1,9 +1,10 @@
 package com.example.kistrading.service;
 
+import com.example.kistrading.config.PropertiesMapping;
 import com.example.kistrading.dto.OrderStockResDto;
 import com.example.kistrading.entity.em.OrderType;
+import com.example.kistrading.entity.em.TradeMode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,40 +21,25 @@ public class TradeService {
     private final WebClientConnector<String> webClientConnectorString;
     private final TokenService tokenService;
 
-    @Value("${kis.train.appkey}")
-    private String trainAppkey;
-    @Value("${kis.train.appsecret}")
-    private String trainAppsecert;
-    @Value("${kis.train.account}")
-    private String trainAccountNum;
-
-    @Value("${kis.real.appkey}")
-    private String realAppkey;
-    @Value("${kis.real.appsecret}")
-    private String realAppsecert;
-    @Value("${kis.real.account}")
-    private String realAccountNum;
-
-    @Value("${kis.mode}")
-    private String mode;
+    private final PropertiesMapping pm;
 
     @Transactional
     public void OrderStock(OrderType orderType, String stockCode,
-                           String orderPrice, String orderAmount){
+                           String orderPrice, String orderAmount) {
 
         Map<String, String> reqBody = new HashMap<>();
         MultiValueMap<String, String> reqHeader = new LinkedMultiValueMap<>();
 
         reqHeader.add("authorization", tokenService.getAndDeleteToken());
-        reqHeader.add("appkey", mode.equals("real") ? realAppkey : trainAppkey);
-        reqHeader.add("appsecert",mode.equals("real") ? realAppsecert : trainAppsecert);
-        if (orderType.getName().equals("BUY")){
-            reqHeader.add("tr_id", mode.equals("real") ? "TTTC0802U" : "VTTC0802U" );
+        reqHeader.add("appkey", pm.getAppKey());
+        reqHeader.add("appsecret", pm.getAppSecret());
+        if (orderType.getName().equals("BUY")) {
+            reqHeader.add("tr_id", pm.getMode().equals(TradeMode.REAL) ? "TTTC0802U" : "VTTC0802U");
         } else if (orderType.getName().equals("SELL")) {
-            reqHeader.add("tr_id", mode.equals("real") ? "TTTC0801U" : "VTTC0801U" );
+            reqHeader.add("tr_id", pm.getMode().equals(TradeMode.REAL) ? "TTTC0801U" : "VTTC0801U");
         }
 
-        reqBody.put("CANO", mode.equals("real") ? realAccountNum : trainAccountNum);
+        reqBody.put("CANO", pm.getAccountNum());
         reqBody.put("ACNT_PRDT_CD", "01");
         reqBody.put("PDNO", stockCode);
         reqBody.put("ORD_DVSN", orderPrice.equals("0") ? "01" : "00");
