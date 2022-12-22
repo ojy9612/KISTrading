@@ -63,7 +63,7 @@ public class TokenService {
 
         for (Token token : tokenList) {
             if (token.getMode().equals(pm.getMode())) {
-                if (token.getExpiredDate().minusHours(12).isBefore(LocalDateTime.now())) {
+                if (token.getExpiredDate().minusHours(6).isBefore(LocalDateTime.now())) {
                     tokenRepository.delete(token);
                 } else {
                     result = token;
