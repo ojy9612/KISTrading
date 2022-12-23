@@ -10,15 +10,17 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
 public class WebClientConnector<T> {
     private final ObjectMapper objectMapper;
     private final WebClient webClient;
+
+    private Queue<LocalDateTime> timeQueue = new LinkedList<>();
 
     /**
      * status code 가 200이 아닐 시 webclient 상에서 에러처리를 별도로 할 수 있지만 현재는 그냥 return 하게 해둠.
@@ -41,6 +43,20 @@ public class WebClientConnector<T> {
         try {
             String requestBodyJson = !body.isEmpty() ? objectMapper.writeValueAsString(body) : "";
 
+            if (timeQueue.size() >= 20) {
+                while (true) {
+                    if (timeQueue.isEmpty()) {
+                        break;
+                    }
+                    if (timeQueue.peek().plusSeconds(1).isAfter(LocalDateTime.now())) {
+                        wait(Duration.between(timeQueue.poll(), LocalDateTime.now()).toMillis());
+                        break;
+                    } else {
+                        timeQueue.poll();
+                    }
+                }
+            }
+
             ResponseEntity<T> block = webClient.method(methodType)
                     .uri(uriBuilder -> uriBuilder
                             .path(uri)
@@ -51,10 +67,14 @@ public class WebClientConnector<T> {
                     .exchangeToMono(clientResponse -> clientResponse.toEntity(classType))
                     .block();
 
+            timeQueue.add(LocalDateTime.now());
+
             return Objects.requireNonNull(block).getBody();
 
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("json error");
+        } catch (InterruptedException e) {
+            throw new RuntimeException("time error");
         }
 
     }

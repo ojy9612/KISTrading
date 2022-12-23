@@ -2,10 +2,7 @@ package com.example.kistrading.controller;
 
 import com.example.kistrading.config.PropertiesMapping;
 import com.example.kistrading.entity.em.OrderType;
-import com.example.kistrading.service.AssetService;
-import com.example.kistrading.service.TokenService;
-import com.example.kistrading.service.TradeService;
-import com.example.kistrading.service.WebClientConnector;
+import com.example.kistrading.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +26,7 @@ public class TestController {
     private final TokenService tokenService;
     private final TradeService tradeService;
     private final AssetService assetService;
+    private final StockInfoPriceService stockInfoPriceService;
     private final ObjectMapper objectMapper;
 
 
@@ -68,6 +67,11 @@ public class TestController {
     @GetMapping("/test4")
     public void test4() {
         tradeService.orderStock(OrderType.BUY, "007680", "0", "10");
+    }
+
+    @GetMapping("/test5")
+    public void test5() {
+        stockInfoPriceService.createStockPrice("007680", LocalDateTime.now(), LocalDateTime.now());
     }
 
 }

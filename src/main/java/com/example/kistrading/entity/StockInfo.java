@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -57,8 +59,30 @@ public class StockInfo extends TimeStamped {
     @Comment("EPS")
     private String eps;
 
+    @OneToMany(mappedBy = "stockInfo", fetch = FetchType.LAZY, orphanRemoval = true)
+    private final List<StockPrice> stockPriceList = new ArrayList<>();
+
+    public void addStockPrice(StockPrice stockPrice) {
+        stockPrice.registerStockInfo(this);
+        this.stockPriceList.add(stockPrice);
+    }
+
     @Builder
     public StockInfo(String name, String code, String otherCode, String fcam, Long amount, String marketCapitalization, String capital, String per, String pbr, String eps) {
+        this.name = name;
+        this.code = code;
+        this.otherCode = otherCode;
+        this.fcam = fcam;
+        this.amount = amount;
+        this.marketCapitalization = marketCapitalization;
+        this.capital = capital;
+        this.per = per;
+        this.pbr = pbr;
+        this.eps = eps;
+    }
+
+    @Builder(builderMethodName = "updateBuilder")
+    public void updateStockInfo(String name, String code, String otherCode, String fcam, Long amount, String marketCapitalization, String capital, String per, String pbr, String eps) {
         this.name = name;
         this.code = code;
         this.otherCode = otherCode;

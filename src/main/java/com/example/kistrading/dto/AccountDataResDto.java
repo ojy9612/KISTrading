@@ -20,9 +20,9 @@ public class AccountDataResDto {
     @JsonProperty("rt_cd")
     private String rtCd;
     @JsonProperty("output2")
-    private List<AccountInfo> accountInfos;
+    private List<Output2> output2s;
     @JsonProperty("output1")
-    private List<StockInfo> stockInfos;
+    private List<Output1> output1s;
     @JsonProperty("ctx_area_nk100")
     private String ctxAreaNk100;
     @JsonProperty("ctx_area_fk100")
@@ -32,7 +32,7 @@ public class AccountDataResDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class StockInfo {
+    public static class Output1 {
         @JsonProperty("stck_loan_unpr")
         private String stckLoanUnpr;
         @JsonProperty("sbst_pric")
@@ -92,7 +92,7 @@ public class AccountDataResDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class AccountInfo {
+    public static class Output2 {
         @JsonProperty("asst_icdc_erng_rt")
         private String asstIcdcErngRt;
         @JsonProperty("asst_icdc_amt")

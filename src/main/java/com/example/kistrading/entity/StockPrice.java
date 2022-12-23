@@ -19,14 +19,6 @@ public class StockPrice extends TimeStamped {
     private Long id;
 
     @Column(nullable = false)
-    @Comment("주식 이름")
-    private String name;
-
-    @Column(nullable = false)
-    @Comment("주식 코드")
-    private String code;
-
-    @Column(nullable = false)
     @Comment("일자")
     private LocalDateTime date;
 
@@ -48,7 +40,7 @@ public class StockPrice extends TimeStamped {
 
     @Column(nullable = false)
     @Comment("거래량")
-    private BigDecimal volume;
+    private Long volume;
 
     @Column(nullable = false)
     @Comment("거래 대금")
@@ -62,10 +54,15 @@ public class StockPrice extends TimeStamped {
     @Comment("전일 대비 기호")
     private String beforeGapPriceSign;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private StockInfo stockInfo;
+
+    public void registerStockInfo(StockInfo stockInfo) {
+        this.stockInfo = stockInfo;
+    }
+
     @Builder
-    public StockPrice(String name, String code, LocalDateTime date, BigDecimal closePrice, BigDecimal openPrice, BigDecimal highPrice, BigDecimal lowPrice, BigDecimal volume, BigDecimal volumeTotalPrice, BigDecimal beforeGapPrice, String beforeGapPriceSign) {
-        this.name = name;
-        this.code = code;
+    public StockPrice(LocalDateTime date, BigDecimal closePrice, BigDecimal openPrice, BigDecimal highPrice, BigDecimal lowPrice, Long volume, BigDecimal volumeTotalPrice, BigDecimal beforeGapPrice, String beforeGapPriceSign, StockInfo stockInfo) {
         this.date = date;
         this.closePrice = closePrice;
         this.openPrice = openPrice;
@@ -75,5 +72,6 @@ public class StockPrice extends TimeStamped {
         this.volumeTotalPrice = volumeTotalPrice;
         this.beforeGapPrice = beforeGapPrice;
         this.beforeGapPriceSign = beforeGapPriceSign;
+        stockInfo.addStockPrice(this);
     }
 }
