@@ -2,7 +2,7 @@ package com.example.kistrading.controller;
 
 import com.example.kistrading.config.PropertiesMapping;
 import com.example.kistrading.entity.em.OrderType;
-import com.example.kistrading.service.InformationService;
+import com.example.kistrading.service.AssetService;
 import com.example.kistrading.service.TokenService;
 import com.example.kistrading.service.TradeService;
 import com.example.kistrading.service.WebClientConnector;
@@ -27,7 +27,7 @@ public class TestController {
     private final WebClientConnector<String> webClientConnectorString;
     private final TokenService tokenService;
     private final TradeService tradeService;
-    private final InformationService informationService;
+    private final AssetService assetService;
     private final ObjectMapper objectMapper;
 
 
@@ -62,7 +62,7 @@ public class TestController {
 
     @GetMapping("/test3")
     public void test3() {
-        informationService.getAccountData();
+        assetService.getAccountData();
     }
 
     @GetMapping("/test4")

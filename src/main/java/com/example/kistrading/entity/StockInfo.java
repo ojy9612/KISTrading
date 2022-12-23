@@ -1,0 +1,73 @@
+package com.example.kistrading.entity;
+
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
+
+import javax.persistence.*;
+
+@Entity
+@Getter
+@NoArgsConstructor
+public class StockInfo extends TimeStamped {
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    @Comment("주식 이름")
+    private String name;
+
+    @Column(nullable = false)
+    @Comment("주식 코드")
+    private String code;
+
+    @Column
+    @Comment("주식 단축코드")
+    private String otherCode;
+
+    @Column
+    @Comment("액면가")
+    private String fcam;
+
+    @Column(nullable = false)
+    @Comment("상장 주수")
+    private Long amount;
+
+    @Column(nullable = false)
+    @Comment("시가 총액")
+    private String marketCapitalization;
+
+    @Column(nullable = false)
+    @Comment("자본금")
+    private String capital;
+
+    @Column(nullable = false)
+    @Comment("PER")
+    private String per;
+
+    @Column(nullable = false)
+    @Comment("PBR")
+    private String pbr;
+
+    @Column
+    @Comment("EPS")
+    private String eps;
+
+    @Builder
+    public StockInfo(String name, String code, String otherCode, String fcam, Long amount, String marketCapitalization, String capital, String per, String pbr, String eps) {
+        this.name = name;
+        this.code = code;
+        this.otherCode = otherCode;
+        this.fcam = fcam;
+        this.amount = amount;
+        this.marketCapitalization = marketCapitalization;
+        this.capital = capital;
+        this.per = per;
+        this.pbr = pbr;
+        this.eps = eps;
+    }
+}

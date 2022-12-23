@@ -59,4 +59,30 @@ public class WebClientConnector<T> {
 
     }
 
+    public ResponseEntity<T> connectIncludeHeader(HttpMethod methodType, String uri, Map<String, String> reqHeader,
+                                                  MultiValueMap<String, String> reqParam, Map<String, String> reqBody, Class<T> classType) {
+
+        Map<String, String> body = reqBody != null ? reqBody : new HashMap<>();
+        Map<String, String> headers = reqHeader != null ? reqHeader : new HashMap<>();
+        MultiValueMap<String, String> params = reqParam != null ? reqParam : new LinkedMultiValueMap<>();
+
+        try {
+            String requestBodyJson = !body.isEmpty() ? objectMapper.writeValueAsString(body) : "";
+
+            return webClient.method(methodType)
+                    .uri(uriBuilder -> uriBuilder
+                            .path(uri)
+                            .queryParams(params)
+                            .build())
+                    .headers(httpHeaders -> httpHeaders.setAll(headers))
+                    .bodyValue(requestBodyJson)
+                    .exchangeToMono(clientResponse -> clientResponse.toEntity(classType))
+                    .block();
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
 }

@@ -5,16 +5,16 @@ import com.example.kistrading.dto.AccountDataResDto;
 import com.example.kistrading.entity.em.TradeMode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class InformationService {
+public class AssetService {
 
     private final WebClientConnector<AccountDataResDto> webClientConnectorDto;
     private final TokenService tokenService;
@@ -47,9 +47,29 @@ public class InformationService {
         reqParam.add("CTX_AREA_NK100", "");
 
 
-        AccountDataResDto connect = webClientConnectorDto.connect(HttpMethod.GET, "/uapi/domestic-stock/v1/trading/inquire-balance",
-                reqHeader, reqParam, reqBody, AccountDataResDto.class);
+        List<AccountDataResDto> responseList = new ArrayList<>();
 
-        System.out.println(connect);
+        String trCont = "F";
+
+        while (trCont.equals("F") || trCont.equals("M")) {
+            ResponseEntity<AccountDataResDto> response = webClientConnectorDto.connectIncludeHeader(HttpMethod.GET, "/uapi/domestic-stock/v1/trading/inquire-balance",
+                    reqHeader, reqParam, reqBody, AccountDataResDto.class);
+
+            List<String> tempTrCont = response.getHeaders().getOrDefault("tr_cont", Collections.singletonList(""));
+            trCont = tempTrCont.get(0);
+
+            AccountDataResDto body = response.getBody();
+            responseList.add(body);
+
+            try {
+                reqParam.set("CTX_AREA_FK100", trCont.equals("F") || trCont.equals("M") ? body.getCtxAreaFk100() : "");
+                reqParam.set("CTX_AREA_NK100", trCont.equals("F") || trCont.equals("M") ? body.getCtxAreaNk100() : "");
+            } catch (NullPointerException e) {
+                throw new NullPointerException("다음 데이터 존재하지 않습니다.");
+            }
+
+        }
+
+        System.out.println(responseList);
     }
 }
