@@ -32,6 +32,13 @@ public class PropertiesMapping {
     private String tempMode;
 
     @Getter
+    @Value("${data.go.key.encoding}")
+    private String enKey;
+    @Getter
+    @Value("${data.go.key.decoding}")
+    private String deKey;
+
+    @Getter
     private String domain;
     @Getter
     private String appKey;

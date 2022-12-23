@@ -46,10 +46,12 @@ public class TestController {
         reqBody.put("appsecret", pm.getAppSecret());
 
 
-        JsonNode test;
+        JsonNode test = null;
         try {
-            test = objectMapper.readTree(webClientConnectorString.connect(HttpMethod.POST, "/oauth2/revokeP",
-                    null, null, reqBody, String.class));
+            for (int i = 0; i < 100; i++) {
+                test = objectMapper.readTree(webClientConnectorString.connect(HttpMethod.POST, "/oauth2/revokeP",
+                        null, null, reqBody, String.class));
+            }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -71,7 +73,17 @@ public class TestController {
 
     @GetMapping("/test5")
     public void test5() {
-        stockInfoPriceService.createStockPrice("007680", LocalDateTime.now(), LocalDateTime.now());
+        stockInfoPriceService.createStockInfoPrice("007680", LocalDateTime.now(), LocalDateTime.now());
+    }
+
+    @GetMapping("/test6")
+    public void test6() {
+        stockInfoPriceService.createUpdateStockCode();
+    }
+
+    @GetMapping("/test8")
+    public void test8() {
+        stockInfoPriceService.getAllStockInfoPrice();
     }
 
 }

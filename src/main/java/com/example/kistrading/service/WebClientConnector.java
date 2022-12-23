@@ -33,9 +33,8 @@ public class WebClientConnector<T> {
      * @param classType  Generic class type (ex. String.class)
      * @return response 를 JsonNode 로 리턴
      */
-    public T connect(HttpMethod methodType, String uri, Map<String, String> reqHeader,
-                     MultiValueMap<String, String> reqParam, Map<String, String> reqBody, Class<T> classType) {
-
+    public synchronized T connect(HttpMethod methodType, String uri, Map<String, String> reqHeader,
+                                  MultiValueMap<String, String> reqParam, Map<String, String> reqBody, Class<T> classType) {
         Map<String, String> body = reqBody != null ? reqBody : new HashMap<>();
         Map<String, String> headers = reqHeader != null ? reqHeader : new HashMap<>();
         MultiValueMap<String, String> params = reqParam != null ? reqParam : new LinkedMultiValueMap<>();
@@ -49,7 +48,7 @@ public class WebClientConnector<T> {
                         break;
                     }
                     if (timeQueue.peek().plusSeconds(1).isAfter(LocalDateTime.now())) {
-                        wait(Duration.between(timeQueue.poll(), LocalDateTime.now()).toMillis());
+                        this.wait(Duration.between(timeQueue.poll(), LocalDateTime.now()).toMillis());
                         break;
                     } else {
                         timeQueue.poll();
@@ -79,8 +78,8 @@ public class WebClientConnector<T> {
 
     }
 
-    public ResponseEntity<T> connectIncludeHeader(HttpMethod methodType, String uri, Map<String, String> reqHeader,
-                                                  MultiValueMap<String, String> reqParam, Map<String, String> reqBody, Class<T> classType) {
+    public synchronized ResponseEntity<T> connectIncludeHeader(HttpMethod methodType, String uri, Map<String, String> reqHeader,
+                                                               MultiValueMap<String, String> reqParam, Map<String, String> reqBody, Class<T> classType) {
 
         Map<String, String> body = reqBody != null ? reqBody : new HashMap<>();
         Map<String, String> headers = reqHeader != null ? reqHeader : new HashMap<>();

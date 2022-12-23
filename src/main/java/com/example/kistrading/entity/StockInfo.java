@@ -60,6 +60,7 @@ public class StockInfo extends TimeStamped {
     private String eps;
 
     @OneToMany(mappedBy = "stockInfo", fetch = FetchType.LAZY, orphanRemoval = true)
+    @OrderBy("date asc ")
     private final List<StockPrice> stockPriceList = new ArrayList<>();
 
     public void addStockPrice(StockPrice stockPrice) {
