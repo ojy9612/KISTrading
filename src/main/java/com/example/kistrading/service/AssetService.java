@@ -27,9 +27,7 @@ public class AssetService {
         MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
         Map<String, String> reqHeader = new HashMap<>();
 
-        String tokenString = tokenService.getAndDeleteToken();
-
-        reqHeader.put("authorization", tokenString);
+        reqHeader.put("authorization", pm.checkGetToken());
         reqHeader.put("appkey", pm.getAppKey());
         reqHeader.put("appsecret", pm.getAppSecret());
         reqHeader.put("tr_id", pm.getMode().equals(TradeMode.REAL) ? "TTTC8434R" : "VTTC8434R");

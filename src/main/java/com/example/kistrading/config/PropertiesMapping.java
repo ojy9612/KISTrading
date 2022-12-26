@@ -1,14 +1,20 @@
 package com.example.kistrading.config;
 
+import com.example.kistrading.entity.Token;
 import com.example.kistrading.entity.em.TradeMode;
+import com.example.kistrading.service.TokenService;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
+import java.time.LocalDateTime;
 
 @Slf4j
 public class PropertiesMapping {
+
+    private final TokenService tokenService;
 
     @Value("${kis.train.domain}")
     private String trainDomain;
@@ -49,11 +55,18 @@ public class PropertiesMapping {
     @Getter
     private String accountNum;
 
+    private Token token;
+
+    @Autowired
+    public PropertiesMapping(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
+
     @PostConstruct
     public void init() throws IllegalAccessException {
         mode = TradeMode.getTradeMode(tempMode);
 
-        if (mode.equals(TradeMode.TRAIN)){
+        if (mode.equals(TradeMode.TRAIN)) {
             log.info("모의투자 계좌로 세팅 되었습니다. mode = " + mode.getName());
             domain = trainDomain;
             appKey = trainAppkey;
@@ -67,6 +80,16 @@ public class PropertiesMapping {
             accountNum = realAccountNum;
         } else {
             throw new IllegalAccessException("허용되지 않은 mode 입니다. - " + tempMode);
+        }
+
+        token = tokenService.getAndDeleteToken();
+    }
+
+    public String checkGetToken() {
+        if (token.getExpiredDate().minusHours(6).isBefore(LocalDateTime.now())) {
+            return tokenService.getAndDeleteToken().getTokenValue();
+        } else {
+            return token.getTokenValue();
         }
     }
 

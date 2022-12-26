@@ -27,7 +27,7 @@ public class TradeService {
         Map<String, String> reqBody = new HashMap<>();
         Map<String, String> reqHeader = new HashMap<>();
 
-        reqHeader.put("authorization", tokenService.getAndDeleteToken());
+        reqHeader.put("authorization", pm.checkGetToken());
         reqHeader.put("appkey", pm.getAppKey());
         reqHeader.put("appsecret", pm.getAppSecret());
         if (orderType.getName().equals("BUY")) {

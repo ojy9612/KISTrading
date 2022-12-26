@@ -41,7 +41,7 @@ public class TestController {
 
     @GetMapping("/test1")
     public String test1() {
-        return tokenService.getAndDeleteToken();
+        return pm.checkGetToken();
     }
 
 

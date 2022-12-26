@@ -56,7 +56,7 @@ public class TokenService {
     }
 
     @Transactional
-    public String getAndDeleteToken(){
+    public Token getAndDeleteToken() {
         List<Token> tokenList = tokenRepository.findAll();
 
         Token result = null;
@@ -71,7 +71,7 @@ public class TokenService {
             }
         }
 
-        return result != null ? result.getTokenValue() : this.createToken().getTokenValue();
+        return result != null ? result : this.createToken();
     }
 
 }

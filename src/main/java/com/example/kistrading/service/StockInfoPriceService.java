@@ -101,7 +101,7 @@ public class StockInfoPriceService {
         Map<String, String> reqHeaders = new HashMap<>();
         MultiValueMap<String, String> reqParams = new LinkedMultiValueMap<>();
 
-        reqHeaders.put("authorization", tokenService.getAndDeleteToken());
+        reqHeaders.put("authorization", pm.checkGetToken());
         reqHeaders.put("appkey", pm.getAppKey());
         reqHeaders.put("appsecret", pm.getAppSecret());
         reqHeaders.put("tr_id", "FHKST03010100");
