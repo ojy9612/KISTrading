@@ -21,7 +21,7 @@ public class AssetService {
 
     private final PropertiesMapping pm;
 
-    public void getAccountData() {
+    public List<AccountDataResDto> getAccountData() {
 
         Map<String, String> reqBody = new HashMap<>();
         MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
@@ -70,6 +70,6 @@ public class AssetService {
 
         }
 
-        System.out.println(responseList);
+        return responseList;
     }
 }

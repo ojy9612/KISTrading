@@ -94,17 +94,17 @@ public class TestController {
     public void test8() {
         List<String> codes = stockInfoRepository.findAll().stream().map(StockInfo::getCode).toList();
 
-        int bifurcation = 1000;
+        int bifurcation = 1200;
 
-        for (int i = 0; i < (codes.size() / bifurcation); i++) {
+        for (int i = 0; i < bifurcation; i++) {
             log.info("현재 bifurcation: " + i + "/" + bifurcation);
             stockInfoPriceService.createManyStockInfoPrices(
-                    codes.subList(i * bifurcation, (i + 1) * bifurcation));
+                    codes.subList(i * (codes.size() / bifurcation), (i + 1) * (codes.size() / bifurcation)));
         }
         if ((codes.size() % bifurcation) != 0) {
             log.info("마지막 작업중 ... ");
             stockInfoPriceService.createManyStockInfoPrices(
-                    codes.subList(((codes.size() / bifurcation) - 1) * bifurcation, codes.size() - 1));
+                    codes.subList((codes.size() / bifurcation) * bifurcation, codes.size() - 1));
         }
         log.info("마지막 끝 ");
 

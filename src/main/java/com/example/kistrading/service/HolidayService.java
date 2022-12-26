@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,7 +46,21 @@ public class HolidayService {
 
         }
 
+        LocalDate date = LocalDate.of(year, 1, 1);
+
+        while (!date.equals(LocalDate.of(year + 1, 1, 1))) {
+            if (date.getDayOfWeek().getValue() == DayOfWeek.SUNDAY.getValue()
+                    || date.getDayOfWeek().getValue() == DayOfWeek.SATURDAY.getValue()) {
+                this.createHoliday(Holiday.builder()
+                        .name(date.getDayOfWeek().name())
+                        .date(date.atStartOfDay())
+                        .build());
+            }
+
+            date = date.plusDays(1);
+        }
     }
+
     @Transactional
     public void createHoliday(Holiday holiday){
         if (!this.isHoliday(holiday.getDate())){

@@ -41,7 +41,7 @@ public class StockInfoPriceService {
     private final PropertiesMapping pm;
 
     @Transactional
-    public void createManyStockInfoPrices(List<String> stockCodeList) { // 시작 날짜 기준으로 최신 값으로 채우기;
+    public synchronized void createManyStockInfoPrices(List<String> stockCodeList) { // 시작 날짜 기준으로 최신 값으로 채우기;
         LocalDateTime now;
         if (LocalTime.now().compareTo(LocalTime.of(16, 0)) < 0) {
             now = LocalDateTime.now().minusDays(1);
@@ -191,7 +191,11 @@ public class StockInfoPriceService {
         if (codeSet.isEmpty()) {
             log.info("신규 상장된 종목이 없습니다.");
         } else {
+            log.info("신규 상장된 주식 수" + codeSet.size());
             this.createManyStockInfoPrices(codeSet.stream().toList());
+        }
+        for (String s : codeSet) {
+            log.info("신규 상장된 주식 코드: " + s);
         }
     }
 
@@ -243,4 +247,8 @@ public class StockInfoPriceService {
         stockCodeRepository.saveAll(newStockCodeList);
     }
 
+    @Transactional(readOnly = true)
+    public List<String> getStockCodeList() {
+        return stockInfoRepository.findAll().stream().map(StockInfo::getCode).toList();
+    }
 }
