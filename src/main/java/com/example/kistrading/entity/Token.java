@@ -5,6 +5,7 @@ import com.example.kistrading.entity.em.TradeMode;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -19,13 +20,16 @@ public class Token extends TimeStamped {
     private Long id;
 
     @Column(length = 500, nullable = false)
+    @Comment("토큰")
     private String tokenValue;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
+    @Comment("매매 모드 (ex. 모의투자, 실전투자)")
     private TradeMode mode;
 
     @Column(nullable = false)
+    @Comment("만료 일자")
     private LocalDateTime expiredDate;
 
 
