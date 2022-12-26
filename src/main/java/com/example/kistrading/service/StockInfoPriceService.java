@@ -36,6 +36,7 @@ public class StockInfoPriceService {
     private final StockInfoRepository stockInfoRepository;
     private final StockPriceRepository stockPriceRepository;
     private final StockCodeRepository stockCodeRepository;
+    private final TokenService tokenService;
 
     private final PropertiesMapping pm;
 
@@ -114,7 +115,7 @@ public class StockInfoPriceService {
         Map<String, String> reqHeaders = new HashMap<>();
         MultiValueMap<String, String> reqParams = new LinkedMultiValueMap<>();
 
-        reqHeaders.put("authorization", pm.checkGetToken());
+        reqHeaders.put("authorization", tokenService.checkGetToken());
         reqHeaders.put("appkey", pm.getAppKey());
         reqHeaders.put("appsecret", pm.getAppSecret());
         reqHeaders.put("tr_id", "FHKST03010100");

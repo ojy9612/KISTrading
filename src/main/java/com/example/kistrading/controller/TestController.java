@@ -29,6 +29,7 @@ public class TestController {
 
     private final WebClientKISConnector<String> webClientKISConnectorString;
     private final TradeService tradeService;
+    private final TokenService tokenService;
     private final AssetService assetService;
     private final StockInfoPriceService stockInfoPriceService;
     private final HolidayService holidayService;
@@ -40,7 +41,7 @@ public class TestController {
 
     @GetMapping("/test1")
     public String test1() {
-        return pm.checkGetToken();
+        return tokenService.checkGetToken();
     }
 
 

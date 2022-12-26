@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -25,6 +26,14 @@ public class TokenService {
     private final WebClientKISConnector<String> webClientKISConnectorString;
 
     private final PropertiesMapping pm;
+
+    private Token token;
+
+    @PostConstruct
+    @Transactional
+    public void init() {
+        token = this.createToken();
+    }
 
     /**
      * 토큰 생성 함수
@@ -48,7 +57,7 @@ public class TokenService {
             throw new RuntimeException(e);
         }
 
-        Token token = Token.builder()
+        Token t = Token.builder()
                 .tokenValue("Bearer " + jsonNode.get("access_token").asText())
                 .expiredDate(LocalDateTime.parse(
                         jsonNode.get("access_token_token_expired").asText(),
@@ -56,7 +65,7 @@ public class TokenService {
                 .mode(pm.getMode())
                 .build();
 
-        return tokenRepository.save(token);
+        return tokenRepository.save(t);
     }
 
     /**
@@ -66,22 +75,31 @@ public class TokenService {
      * @return Token
      */
     @Transactional
-    public Token getDeleteToken() {
+    public Token createDeleteToken() {
         List<Token> tokenList = tokenRepository.findAll();
 
         Token result = null;
 
-        for (Token token : tokenList) {
-            if (token.getMode().equals(pm.getMode())) {
-                if (token.getExpiredDate().minusHours(6).isBefore(LocalDateTime.now())) {
-                    tokenRepository.delete(token);
+        for (Token t : tokenList) {
+            if (t.getMode().equals(pm.getMode())) {
+                if (t.getExpiredDate().minusHours(6).isBefore(LocalDateTime.now())) {
+                    tokenRepository.delete(t);
                 } else {
-                    result = token;
+                    result = t;
                 }
             }
         }
 
         return result != null ? result : this.createToken();
+    }
+
+    @Transactional
+    public String checkGetToken() {
+        if (token.getExpiredDate().minusHours(6).isBefore(LocalDateTime.now())) {
+            return this.createDeleteToken().getTokenValue();
+        } else {
+            return token.getTokenValue();
+        }
     }
 
 }
