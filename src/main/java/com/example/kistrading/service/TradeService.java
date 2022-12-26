@@ -15,7 +15,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class TradeService {
-    private final WebClientConnector<OrderStockResDto> webClientConnectorDto;
+    private final WebClientKISConnector<OrderStockResDto> webClientKISConnectorDto;
     private final TokenService tokenService;
 
     private final PropertiesMapping pm;
@@ -43,7 +43,7 @@ public class TradeService {
         reqBody.put("ORD_QTY", orderAmount);
         reqBody.put("ORD_UNPR", orderPrice);
 
-        OrderStockResDto response = webClientConnectorDto.connect(HttpMethod.POST, "/uapi/domestic-stock/v1/trading/order-cash",
+        OrderStockResDto response = webClientKISConnectorDto.connect(HttpMethod.POST, "/uapi/domestic-stock/v1/trading/order-cash",
                 reqHeader, null, reqBody, OrderStockResDto.class);
 
 

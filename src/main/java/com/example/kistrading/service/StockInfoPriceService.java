@@ -9,21 +9,14 @@ import com.example.kistrading.entity.StockPrice;
 import com.example.kistrading.repository.StockCodeRepository;
 import com.example.kistrading.repository.StockInfoRepository;
 import com.example.kistrading.repository.StockPriceRepository;
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.DefaultUriBuilderFactory;
-import reactor.netty.http.client.HttpClient;
 
-import javax.net.ssl.SSLException;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -31,13 +24,15 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StockInfoPriceService {
 
-    private final WebClientConnector<StockInfoPriceResDto> webClientConnectorStockInfoPriceResDto;
-    private final WebClient webClient;
+    private final WebClientKISConnector<StockInfoPriceResDto> webClientKISConnectorStockInfoPriceResDto;
+    private final WebClientDataGoKrConnector<StockCodeResDto> webClientDataGoKrConnectorStockCodeResDto;
     private final TokenService tokenService;
     private final StockInfoRepository stockInfoRepository;
     private final StockPriceRepository stockPriceRepository;
@@ -46,7 +41,7 @@ public class StockInfoPriceService {
     private final PropertiesMapping pm;
 
     @Transactional
-    public void getAllStockInfoPrice() { // 시작 날짜 기준으로 최신 값으로 채우기
+    public void createManyStockInfoPrices(List<String> stockCodeList) { // 시작 날짜 기준으로 최신 값으로 채우기;
         LocalDateTime now;
         if (LocalTime.now().compareTo(LocalTime.of(16, 0)) < 0) {
             now = LocalDateTime.now().minusDays(1);
@@ -54,20 +49,21 @@ public class StockInfoPriceService {
             now = LocalDateTime.now();
         }
 
-        List<StockInfo> stockInfoList = stockInfoRepository.findAll();
-
-
-        for (StockInfo stockInfo : stockInfoList) {
-            List<StockPrice> stockPriceList = stockInfo.getStockPriceList();
+        for (String code : stockCodeList) {
+            Optional<StockInfo> opCode = stockInfoRepository.findByCode(code);
             LocalDateTime date;
             long delta;
-            if (!stockPriceList.isEmpty()) {
-                date = stockPriceList.get(0).getDate();
 
-                delta = Duration.between(date, now).toDays();
+            if (opCode.isPresent()) {
+                StockInfo stockInfo = opCode.get();
+                List<StockPrice> stockPriceList = stockInfo.getStockPriceList();
+                if (!stockPriceList.isEmpty()) {
+                    date = stockPriceList.get(0).getDate();
 
-                if (delta <= 0) {
-                    continue;
+                    delta = Duration.between(date, now).toDays();
+
+                } else {
+                    delta = 8000; // 약 22년 치
                 }
             } else {
                 delta = 8000;
@@ -90,13 +86,17 @@ public class StockInfoPriceService {
                     delta = 0;
                 }
 
-                createStockInfoPrice(stockInfo.getCode(), start, end);
+                boolean isNext = createStockInfoPrice(code, start, end);
+
+                if (!isNext) {
+                    break;
+                }
             }
         }
     }
 
     @Transactional
-    public void createStockInfoPrice(String stockCode, LocalDateTime start, LocalDateTime end) {
+    public boolean createStockInfoPrice(String stockCode, LocalDateTime start, LocalDateTime end) {
 
         Map<String, String> reqHeaders = new HashMap<>();
         MultiValueMap<String, String> reqParams = new LinkedMultiValueMap<>();
@@ -113,7 +113,7 @@ public class StockInfoPriceService {
         reqParams.set("FID_PERIOD_DIV_CODE", "D");
         reqParams.set("FID_ORG_ADJ_PRC", "0");
 
-        StockInfoPriceResDto response = webClientConnectorStockInfoPriceResDto.connect(HttpMethod.GET, "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice",
+        StockInfoPriceResDto response = webClientKISConnectorStockInfoPriceResDto.connect(HttpMethod.GET, "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice",
                 reqHeaders, reqParams, null, StockInfoPriceResDto.class);
 
         if (response.getRtCd().equals("0")) {
@@ -150,13 +150,12 @@ public class StockInfoPriceService {
             }
             stockInfoRepository.save(stockInfo);
 
-
-            System.out.println(stockInfo.getName());
-
             List<StockPrice> stockPriceList = new ArrayList<>();
 
+            int checkNullCnt = 0;
             for (StockInfoPriceResDto.Output2 output2 : response.getOutput2()) {
                 if (output2.getStckBsopDate() == null) {
+                    checkNullCnt++;
                     continue;
                 }
 
@@ -175,69 +174,48 @@ public class StockInfoPriceService {
 
             }
 
-
             stockPriceRepository.saveAll(stockPriceList);
+
+            return checkNullCnt < response.getOutput2().size();
         }
+        throw new RuntimeException("KIS 통신 에러");
     }
 
     @Transactional
     public void checkNewStock() {
-        int codeSize = stockCodeRepository.findAll().size();
-        int infoSize = stockInfoRepository.findAll().size();
+        Set<String> codeSet = stockCodeRepository.findAll().stream().map(StockCode::getCode).collect(Collectors.toSet());
+        Set<String> infoSet = stockInfoRepository.findAll().stream().map(StockInfo::getCode).collect(Collectors.toSet());
 
-        if (codeSize != infoSize) {
+        codeSet.removeAll(infoSet);
 
+        if (codeSet.isEmpty()) {
+            log.info("신규 상장된 종목이 없습니다.");
+        } else {
+            this.createManyStockInfoPrices(codeSet.stream().toList());
         }
     }
 
     @Transactional
-    public void createUpdateStockCode() { // 하드 코딩.. KIS가 종목코드 업데이트 해주길 기다립시다..
-        String url = "https://apis.data.go.kr/1160100/service/GetKrxListedInfoService/getItemInfo?" +
-                "serviceKey=" + pm.getEnKey();
-
-        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(url);
-        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.VALUES_ONLY);
-
-        WebClient copyWebClient = webClient.mutate()
-                .clientConnector(   // ssl 접속 허용..
-                        new ReactorClientHttpConnector(
-                                HttpClient.create().secure(t -> {
-                                    try {
-                                        t.sslContext(SslContextBuilder
-                                                .forClient()
-                                                .trustManager(InsecureTrustManagerFactory.INSTANCE)
-                                                .build());
-                                    } catch (SSLException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                })
-                        ))
-                .uriBuilderFactory(factory)
-                .baseUrl(url)
-                .build();
-
+    public void updateStockCode() {
         int pageNo = 1;
         int totalCount = Integer.MAX_VALUE;
         List<StockCodeResDto.Item> bodyList = new ArrayList<>();
-        ResponseEntity<StockCodeResDto> response;
+        StockCodeResDto response;
         String beforeDate = LocalDateTime.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
+        reqParam.set("resultType", "json");
+        reqParam.set("numOfRows", "1000");
+        reqParam.set("basDt", beforeDate);
 
         while (totalCount > 1000 * (pageNo - 1)) {
-            int finalPageNo = pageNo;
-            response = copyWebClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("")
-                            .queryParam("pageNo", finalPageNo)
-                            .queryParam("resultType", "json")
-                            .queryParam("numOfRows", "1000")
-                            .queryParam("basDt", beforeDate)
-                            .build())
-                    .exchangeToMono(clientResponse -> clientResponse.toEntity(StockCodeResDto.class))
-                    .block();
+            reqParam.set("pageNo", String.valueOf(pageNo));
+            response = webClientDataGoKrConnectorStockCodeResDto.connect(HttpMethod.GET,
+                    "1160100/service/GetKrxListedInfoService/getItemInfo",
+                    null, reqParam, null, StockCodeResDto.class);
 
-            totalCount = response.getBody().getResponse().getBody().getTotalcount();
+            totalCount = response.getResponse().getBody().getTotalcount();
             pageNo++;
-            bodyList.addAll(response.getBody().getResponse().getBody().getItems().getItem());
+            bodyList.addAll(response.getResponse().getBody().getItems().getItem());
         }
 
         List<StockCode> stockCodeList = bodyList.stream().filter(item -> item.getMrktctg().equals("KOSDAQ") || item.getMrktctg().equals("KOSPI"))
@@ -252,9 +230,10 @@ public class StockInfoPriceService {
 
         List<StockCode> newStockCodeList = all.stream().filter(stockCode -> {
             for (StockCode code : stockCodeList) {
-                if (code.getCode().equals(stockCode.getCode())
-                        && code.getName().equals(stockCode.getName())
-                        && code.getMarket().equals(stockCode.getName())) {
+                if (code.getCode().equals(stockCode.getCode())) {
+                    if (!code.getName().equals(stockCode.getName()) || !code.getMarket().equals(stockCode.getName())) {
+                        stockCodeRepository.deleteByCode(code.getCode());
+                    }
                     return false;
                 }
             }

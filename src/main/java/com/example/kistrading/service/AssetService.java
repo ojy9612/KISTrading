@@ -16,7 +16,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AssetService {
 
-    private final WebClientConnector<AccountDataResDto> webClientConnectorDto;
+    private final WebClientKISConnector<AccountDataResDto> webClientKISConnectorDto;
     private final TokenService tokenService;
 
     private final PropertiesMapping pm;
@@ -52,7 +52,7 @@ public class AssetService {
         String trCont = "F";
 
         while (trCont.equals("F") || trCont.equals("M")) {
-            ResponseEntity<AccountDataResDto> response = webClientConnectorDto.connectIncludeHeader(HttpMethod.GET, "/uapi/domestic-stock/v1/trading/inquire-balance",
+            ResponseEntity<AccountDataResDto> response = webClientKISConnectorDto.connectIncludeHeader(HttpMethod.GET, "/uapi/domestic-stock/v1/trading/inquire-balance",
                     reqHeader, reqParam, reqBody, AccountDataResDto.class);
 
             List<String> tempTrCont = response.getHeaders().getOrDefault("tr_cont", Collections.singletonList(""));

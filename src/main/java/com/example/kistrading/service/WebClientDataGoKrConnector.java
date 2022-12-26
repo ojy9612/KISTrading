@@ -3,6 +3,7 @@ package com.example.kistrading.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -10,18 +11,17 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
-public class WebClientConnector<T> {
+public class WebClientDataGoKrConnector<T> {
     private final ObjectMapper objectMapper;
-    private final WebClient webClient;
-
-    private Queue<LocalDateTime> timeQueue = new LinkedList<>();
-
+    @Qualifier("WebClientDataGoKr")
+    private final WebClient webClientDataGoKr;
+    
     /**
      * status code 가 200이 아닐 시 webclient 상에서 에러처리를 별도로 할 수 있지만 현재는 그냥 return 하게 해둠.
      *
@@ -42,21 +42,7 @@ public class WebClientConnector<T> {
         try {
             String requestBodyJson = !body.isEmpty() ? objectMapper.writeValueAsString(body) : "";
 
-            if (timeQueue.size() >= 20) {
-                while (true) {
-                    if (timeQueue.isEmpty()) {
-                        break;
-                    }
-                    if (timeQueue.peek().plusSeconds(1).isAfter(LocalDateTime.now())) {
-                        this.wait(Duration.between(timeQueue.poll(), LocalDateTime.now()).toMillis());
-                        break;
-                    } else {
-                        timeQueue.poll();
-                    }
-                }
-            }
-
-            ResponseEntity<T> block = webClient.method(methodType)
+            ResponseEntity<T> block = webClientDataGoKr.method(methodType)
                     .uri(uriBuilder -> uriBuilder
                             .path(uri)
                             .queryParams(params)
@@ -66,16 +52,12 @@ public class WebClientConnector<T> {
                     .exchangeToMono(clientResponse -> clientResponse.toEntity(classType))
                     .block();
 
-            timeQueue.add(LocalDateTime.now());
 
             return Objects.requireNonNull(block).getBody();
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException("json error");
-        } catch (InterruptedException e) {
-            throw new RuntimeException("time error");
         }
-
     }
 
     public synchronized ResponseEntity<T> connectIncludeHeader(HttpMethod methodType, String uri, Map<String, String> reqHeader,
@@ -88,7 +70,7 @@ public class WebClientConnector<T> {
         try {
             String requestBodyJson = !body.isEmpty() ? objectMapper.writeValueAsString(body) : "";
 
-            return webClient.method(methodType)
+            return webClientDataGoKr.method(methodType)
                     .uri(uriBuilder -> uriBuilder
                             .path(uri)
                             .queryParams(params)

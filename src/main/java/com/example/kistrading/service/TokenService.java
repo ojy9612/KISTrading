@@ -22,7 +22,7 @@ import java.util.Map;
 public class TokenService {
     private final TokenRepository tokenRepository;
     private final ObjectMapper objectMapper;
-    private final WebClientConnector<String> webClientConnectorString;
+    private final WebClientKISConnector<String> webClientKISConnectorString;
 
     private final PropertiesMapping pm;
 
@@ -37,7 +37,7 @@ public class TokenService {
         JsonNode jsonNode;
         try {
             jsonNode = objectMapper.readTree(
-                    webClientConnectorString.connect(HttpMethod.POST, "/oauth2/tokenP",
+                    webClientKISConnectorString.connect(HttpMethod.POST, "/oauth2/tokenP",
                             null, null, reqBody, String.class)
             );
         } catch (JsonProcessingException e) {
