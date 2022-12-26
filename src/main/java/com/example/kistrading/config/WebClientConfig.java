@@ -22,9 +22,16 @@ public class WebClientConfig {
 
     private final PropertiesMapping pm;
 
+    /**
+     * KIS 통신용 WebClient 설정
+     * TLS1.3 버전과 maxIdleTime 설정을 했다.
+     *
+     * @return WebClient
+     */
     @Bean
     @Qualifier("WebClientKIS")
     public WebClient webClientKIS() {
+
         // The connection observed an error  reactor.netty.http.client.PrematureCloseException: Connection prematurely closed BEFORE response
         // 위 에러 떄문에 추가 함.(패킷 단계에서 분석해야 함) 'io.micrometer:micrometer-core' 를 dependency 에 추가해야 함.
         ConnectionProvider provider = ConnectionProvider.builder("custom-provider")
@@ -57,6 +64,12 @@ public class WebClientConfig {
                 .build();
     }
 
+    /**
+     * 공공데이터포탈 통신용 WebClient 설정
+     * ssl 접속을 위한 설정, RequestParam 을 Encoding 하지 않게 설정을 했다.
+     *
+     * @return WebClient
+     */
     @Bean
     @Qualifier("WebClientDataGoKr")
     public WebClient webClientDataGoKr() {

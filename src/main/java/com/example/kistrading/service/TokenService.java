@@ -26,6 +26,10 @@ public class TokenService {
 
     private final PropertiesMapping pm;
 
+    /**
+     * 토큰 생성 함수
+     * 직접 사용 금지 (PropertiesMapping 에서 사용)
+     */
     @Transactional
     public Token createToken() {
         Map<String, String> reqBody = new HashMap<>();
@@ -55,8 +59,14 @@ public class TokenService {
         return tokenRepository.save(token);
     }
 
+    /**
+     * 토큰을 가져오거나 Expired 되었다면 삭제하고 생성하는 함수
+     * 직접 사용 금지 (PropertiesMapping 에서 사용)
+     *
+     * @return Token
+     */
     @Transactional
-    public Token getAndDeleteToken() {
+    public Token getDeleteToken() {
         List<Token> tokenList = tokenRepository.findAll();
 
         Token result = null;

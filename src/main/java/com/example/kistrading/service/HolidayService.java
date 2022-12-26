@@ -22,6 +22,11 @@ public class HolidayService {
     private final WebClientDataGoKrConnector<HolidayResDto> webClientDataGoKrConnectorHolidayResDto;
     private final HolidayRepository holidayRepository;
 
+    /**
+     * 공휴일과 주말을 계산해 DB에 데이터를 생성한다.
+     *
+     * @param year 년도
+     */
     @Transactional
     public void createHolidaysByYear(int year) {
         MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
@@ -61,20 +66,26 @@ public class HolidayService {
         }
     }
 
+    /**
+     * 공휴일이 이미 DB에 있는지 검사 후 생성한다.
+     *
+     * @param holiday 저장할 Holiday 객체
+     */
     @Transactional
-    public void createHoliday(Holiday holiday){
-        if (!this.isHoliday(holiday.getDate())){
+    public void createHoliday(Holiday holiday) {
+        if (!this.isHoliday(holiday.getDate())) {
             holidayRepository.save(holiday);
         }
     }
 
-    @Transactional
-    public void deleteHoliday(Holiday holiday){
-        holidayRepository.delete(holiday);
-    }
-
+    /**
+     * 입력한 날짜가 공휴일인지 검사한다.
+     *
+     * @param date 검사할 날짜
+     * @return boolean
+     */
     @Transactional(readOnly = true)
-    public boolean isHoliday(LocalDateTime date){
+    public boolean isHoliday(LocalDateTime date) {
         return holidayRepository.findByDate(date).isPresent();
     }
 

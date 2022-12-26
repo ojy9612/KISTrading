@@ -18,7 +18,7 @@ public class Scheduler {
     private final AssetService assetService;
     private final TradeService tradeService;
     private final HolidayService holidayService;
-
+    
 
     /* 초 분 시 일 월 요일, [참고문서:https://zamezzz.tistory.com/197] */
 //    @Scheduled(cron = "0 0 8 * * ?") // 매일 오전 8시에 실행

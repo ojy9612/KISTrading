@@ -82,12 +82,12 @@ public class PropertiesMapping {
             throw new IllegalAccessException("허용되지 않은 mode 입니다. - " + tempMode);
         }
 
-        token = tokenService.getAndDeleteToken();
+        token = tokenService.getDeleteToken();
     }
 
     public String checkGetToken() {
         if (token.getExpiredDate().minusHours(6).isBefore(LocalDateTime.now())) {
-            return tokenService.getAndDeleteToken().getTokenValue();
+            return tokenService.getDeleteToken().getTokenValue();
         } else {
             return token.getTokenValue();
         }

@@ -17,10 +17,14 @@ import java.util.*;
 public class AssetService {
 
     private final WebClientKISConnector<AccountDataResDto> webClientKISConnectorDto;
-    private final TokenService tokenService;
 
     private final PropertiesMapping pm;
 
+    /**
+     * 현재 매수 내역, 계좌 현황 정보를 가져온다.
+     *
+     * @return List<AccountDataResDto>
+     */
     public List<AccountDataResDto> getAccountData() {
 
         Map<String, String> reqBody = new HashMap<>();

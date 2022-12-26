@@ -16,10 +16,17 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TradeService {
     private final WebClientKISConnector<OrderStockResDto> webClientKISConnectorDto;
-    private final TokenService tokenService;
 
     private final PropertiesMapping pm;
 
+    /**
+     * 매수, 매도 주문을 넣는다.
+     *
+     * @param orderType   매수 or 매도
+     * @param stockCode   종목코드
+     * @param orderPrice  매매가
+     * @param orderAmount 매매수량
+     */
     @Transactional
     public void orderStock(OrderType orderType, String stockCode,
                            String orderPrice, String orderAmount) {

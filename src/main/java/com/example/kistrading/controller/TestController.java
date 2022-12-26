@@ -28,7 +28,6 @@ public class TestController {
     private final PropertiesMapping pm;
 
     private final WebClientKISConnector<String> webClientKISConnectorString;
-    private final TokenService tokenService;
     private final TradeService tradeService;
     private final AssetService assetService;
     private final StockInfoPriceService stockInfoPriceService;

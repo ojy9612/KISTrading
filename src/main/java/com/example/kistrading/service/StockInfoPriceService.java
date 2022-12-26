@@ -33,13 +33,18 @@ public class StockInfoPriceService {
 
     private final WebClientKISConnector<StockInfoPriceResDto> webClientKISConnectorStockInfoPriceResDto;
     private final WebClientDataGoKrConnector<StockCodeResDto> webClientDataGoKrConnectorStockCodeResDto;
-    private final TokenService tokenService;
     private final StockInfoRepository stockInfoRepository;
     private final StockPriceRepository stockPriceRepository;
     private final StockCodeRepository stockCodeRepository;
 
     private final PropertiesMapping pm;
 
+    /**
+     * 종목코드를 통해 일봉 데이터를 DB에 추가한다.
+     * 일봉 갯수의 default 는 8000개 이며 DB에 등록된 가장 최근 데이터를 기준으로 값을 넣는다.
+     *
+     * @param stockCodeList 종목코드 리스트
+     */
     @Transactional
     public synchronized void createManyStockInfoPrices(List<String> stockCodeList) { // 시작 날짜 기준으로 최신 값으로 채우기;
         LocalDateTime now;
@@ -95,6 +100,14 @@ public class StockInfoPriceService {
         }
     }
 
+    /**
+     * 종목 하나에 대해 StockInfo 를 업데이트, 생성 하며 일봉데이터를 넣는다.(최대 100개, 약 97개 불러옴)
+     *
+     * @param stockCode 종목코드
+     * @param start     일봉 데이터 시작일
+     * @param end       일봉 데이터 마지막일
+     * @return boolean
+     */
     @Transactional
     public boolean createStockInfoPrice(String stockCode, LocalDateTime start, LocalDateTime end) {
 
@@ -181,6 +194,10 @@ public class StockInfoPriceService {
         throw new RuntimeException("KIS 통신 에러");
     }
 
+    /**
+     * 신규 상장된 종목의 StockInfo, 일봉데이터를 넣는다.
+     * createStockInfoPrice() 함수를 통해 데이터를 넣을 수도 있지만 신규 상장된 목록을 따로 보기위해 만들었다.
+     */
     @Transactional
     public void checkNewStock() {
         Set<String> codeSet = stockCodeRepository.findAll().stream().map(StockCode::getCode).collect(Collectors.toSet());
@@ -199,6 +216,9 @@ public class StockInfoPriceService {
         }
     }
 
+    /**
+     * 상장된 모든 종목 코드를 업데이트, 생성 한다.
+     */
     @Transactional
     public void updateStockCode() {
         int pageNo = 1;
@@ -247,6 +267,11 @@ public class StockInfoPriceService {
         stockCodeRepository.saveAll(newStockCodeList);
     }
 
+    /**
+     * DB에 저장된 모든 종목코드를 불러온다.
+     *
+     * @return List<String> 종목코드 List
+     */
     @Transactional(readOnly = true)
     public List<String> getStockCodeList() {
         return stockInfoRepository.findAll().stream().map(StockInfo::getCode).toList();

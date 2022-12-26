@@ -60,6 +60,9 @@ public class WebClientDataGoKrConnector<T> {
         }
     }
 
+    /**
+     * 위 함수와 동일하다. Header 정보를 포함하고 싶을 때 사용
+     */
     public synchronized ResponseEntity<T> connectIncludeHeader(HttpMethod methodType, String uri, Map<String, String> reqHeader,
                                                                MultiValueMap<String, String> reqParam, Map<String, String> reqBody, Class<T> classType) {
 

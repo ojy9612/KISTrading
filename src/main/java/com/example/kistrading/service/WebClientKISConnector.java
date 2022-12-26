@@ -26,6 +26,7 @@ public class WebClientKISConnector<T> {
 
     /**
      * status code 가 200이 아닐 시 webclient 상에서 에러처리를 별도로 할 수 있지만 현재는 그냥 return 하게 해둠.
+     * 1초당 20개의 요청만 보내게끔 설계했다.
      *
      * @param methodType HTTP method
      * @param uri        base url 을 제외 한 uri
@@ -80,6 +81,9 @@ public class WebClientKISConnector<T> {
 
     }
 
+    /**
+     * 위 함수와 동일하다. Header 정보를 포함하고 싶을 때 사용
+     */
     public synchronized ResponseEntity<T> connectIncludeHeader(HttpMethod methodType, String uri, Map<String, String> reqHeader,
                                                                MultiValueMap<String, String> reqParam, Map<String, String> reqBody, Class<T> classType) {
 
@@ -90,7 +94,21 @@ public class WebClientKISConnector<T> {
         try {
             String requestBodyJson = !body.isEmpty() ? objectMapper.writeValueAsString(body) : "";
 
-            return webClientKIS.method(methodType)
+            if (timeQueue.size() >= 20) {
+                while (true) {
+                    if (timeQueue.isEmpty()) {
+                        break;
+                    }
+                    if (timeQueue.peek().plusSeconds(1).isAfter(LocalDateTime.now())) {
+                        this.wait(Duration.between(timeQueue.poll(), LocalDateTime.now()).toMillis());
+                        break;
+                    } else {
+                        timeQueue.poll();
+                    }
+                }
+            }
+
+            ResponseEntity<T> block = webClientKIS.method(methodType)
                     .uri(uriBuilder -> uriBuilder
                             .path(uri)
                             .queryParams(params)
@@ -100,7 +118,13 @@ public class WebClientKISConnector<T> {
                     .exchangeToMono(clientResponse -> clientResponse.toEntity(classType))
                     .block();
 
+            timeQueue.add(LocalDateTime.now());
+
+            return block;
+
         } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
