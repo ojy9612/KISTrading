@@ -29,15 +29,18 @@ public class TokenService {
 
     private Token token;
 
+    /**
+     * 생성자를 통해 토큰을 가져온다.
+     */
     @PostConstruct
     @Transactional
     public void init() {
-        token = this.createToken();
+        token = this.createDeleteToken();
     }
 
     /**
      * 토큰 생성 함수
-     * 직접 사용 금지 (PropertiesMapping 에서 사용)
+     * 직접 사용 금지
      */
     @Transactional
     public Token createToken() {
@@ -70,7 +73,7 @@ public class TokenService {
 
     /**
      * 토큰을 가져오거나 Expired 되었다면 삭제하고 생성하는 함수
-     * 직접 사용 금지 (PropertiesMapping 에서 사용)
+     * 직접 사용 금지
      *
      * @return Token
      */
@@ -93,6 +96,12 @@ public class TokenService {
         return result != null ? result : this.createToken();
     }
 
+    /**
+     * 토큰이 expired 되었는지 DB에 들리지 않고 확인함.
+     * 직접 사용 가능
+     *
+     * @return String Token value
+     */
     @Transactional
     public String checkGetToken() {
         if (token.getExpiredDate().minusHours(6).isBefore(LocalDateTime.now())) {

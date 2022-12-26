@@ -51,7 +51,6 @@ public class PropertiesMapping {
     private String accountNum;
 
 
-
     @PostConstruct
     public void init() throws IllegalAccessException {
         mode = TradeMode.getTradeMode(tempMode);

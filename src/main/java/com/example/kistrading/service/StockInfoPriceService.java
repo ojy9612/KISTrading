@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,6 +36,7 @@ public class StockInfoPriceService {
     private final StockPriceRepository stockPriceRepository;
     private final StockCodeRepository stockCodeRepository;
     private final TokenService tokenService;
+    private final HolidayService holidayService;
 
     private final PropertiesMapping pm;
 
@@ -48,12 +48,7 @@ public class StockInfoPriceService {
      */
     @Transactional
     public synchronized void createManyStockInfoPrices(List<String> stockCodeList) { // 시작 날짜 기준으로 최신 값으로 채우기;
-        LocalDateTime now;
-        if (LocalTime.now().compareTo(LocalTime.of(16, 0)) < 0) {
-            now = LocalDateTime.now().minusDays(1);
-        } else {
-            now = LocalDateTime.now();
-        }
+        LocalDateTime now = holidayService.checkAvailableDate();
 
         for (String code : stockCodeList) {
             Optional<StockInfo> opCode = stockInfoRepository.findByCode(code);

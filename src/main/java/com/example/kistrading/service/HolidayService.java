@@ -3,6 +3,7 @@ package com.example.kistrading.service;
 import com.example.kistrading.dto.HolidayResDto;
 import com.example.kistrading.entity.Holiday;
 import com.example.kistrading.repository.HolidayRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
@@ -10,9 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import javax.annotation.PostConstruct;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
@@ -21,6 +24,29 @@ public class HolidayService {
 
     private final WebClientDataGoKrConnector<HolidayResDto> webClientDataGoKrConnectorHolidayResDto;
     private final HolidayRepository holidayRepository;
+
+    @Getter
+    private LocalDateTime nowDate;
+    @Getter
+    private LocalDateTime availableDate;
+
+
+    @PostConstruct
+    @Transactional
+    public LocalDateTime checkAvailableDate() {
+        if (LocalTime.now().compareTo(LocalTime.of(16, 0)) < 0) {
+            nowDate = LocalDateTime.now().minusDays(1);
+        } else {
+            nowDate = LocalDateTime.now();
+        }
+
+        availableDate = nowDate;
+        while (this.isHoliday(availableDate)) {
+            availableDate = availableDate.minusDays(1);
+        }
+
+        return availableDate;
+    }
 
     /**
      * 공휴일과 주말을 계산해 DB에 데이터를 생성한다.
