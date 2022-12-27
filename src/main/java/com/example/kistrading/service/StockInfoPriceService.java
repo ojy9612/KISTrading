@@ -47,7 +47,7 @@ public class StockInfoPriceService {
      * @param stockCodeList 종목코드 리스트
      */
     @Transactional
-    public synchronized void createManyStockInfoPrices(List<String> stockCodeList) { // 시작 날짜 기준으로 최신 값으로 채우기;
+    public synchronized void createManyStockInfoPrices(List<String> stockCodeList) {
         LocalDateTime now = holidayService.checkAvailableDate();
 
         for (String code : stockCodeList) {

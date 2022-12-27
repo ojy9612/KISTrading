@@ -21,7 +21,7 @@ public class Scheduler {
     
 
     /* 초 분 시 일 월 요일, [참고문서:https://zamezzz.tistory.com/197] */
-//    @Scheduled(cron = "0 0 8 * * ?") // 매일 오전 8시에 실행
+//    @Scheduled(cron = "0 0 6 * * ?") // 매일 오전 6시에 실행
     public void tradeSetting() {
 
         holidayService.createHolidaysByYear(LocalDate.now().getYear());
@@ -32,11 +32,11 @@ public class Scheduler {
 
         } else {
             log.info("오늘은 개장일 입니다.");
+            stockInfoPriceService.updateStockCode(); // 신규,수정 된 종목코드 불러오기
             stockInfoPriceService.createManyStockInfoPrices(stockInfoPriceService.getStockCodeList()); // 종가 업데이트
             stockInfoPriceService.checkNewStock(); // 신규 종목 업데이트
         }
 
-        stockInfoPriceService.updateStockCode(); // 신규,수정 된 종목코드 불러오기
 
         List<AccountDataResDto> accountDataList = assetService.getAccountData(); // 계좌 정보
 

@@ -36,8 +36,8 @@ public class WebClientConfig {
         // 위 에러 떄문에 추가 함.(패킷 단계에서 분석해야 함) 'io.micrometer:micrometer-core' 를 dependency 에 추가해야 함.
         ConnectionProvider provider = ConnectionProvider.builder("custom-provider")
                 .maxConnections(100)
-                .maxIdleTime(Duration.ofSeconds(4))
-                .maxLifeTime(Duration.ofSeconds(4))
+                .maxIdleTime(Duration.ofSeconds(3))
+                .maxLifeTime(Duration.ofSeconds(3))
                 .pendingAcquireTimeout(Duration.ofMillis(5000))
                 .pendingAcquireMaxCount(-1)
                 .evictInBackground(Duration.ofSeconds(30))
