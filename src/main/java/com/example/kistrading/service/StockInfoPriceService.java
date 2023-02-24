@@ -1,14 +1,14 @@
 package com.example.kistrading.service;
 
 import com.example.kistrading.config.PropertiesMapping;
+import com.example.kistrading.domain.StockCode.entity.StockCode;
+import com.example.kistrading.domain.StockCode.repository.StockCodeRepository;
+import com.example.kistrading.domain.StockInfo.entity.StockInfo;
+import com.example.kistrading.domain.StockInfo.repository.StockInfoRepository;
+import com.example.kistrading.domain.StockPrice.entity.StockPrice;
+import com.example.kistrading.domain.StockPrice.repository.StockPriceRepository;
 import com.example.kistrading.dto.StockCodeResDto;
 import com.example.kistrading.dto.StockInfoPriceResDto;
-import com.example.kistrading.entity.StockCode;
-import com.example.kistrading.entity.StockInfo;
-import com.example.kistrading.entity.StockPrice;
-import com.example.kistrading.repository.StockCodeRepository;
-import com.example.kistrading.repository.StockInfoRepository;
-import com.example.kistrading.repository.StockPriceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
@@ -45,9 +45,12 @@ public class StockInfoPriceService {
      * 일봉 갯수의 default 는 8000개 이며 DB에 등록된 가장 최근 데이터를 기준으로 값을 넣는다.
      *
      * @param stockCodeList 종목코드 리스트
+     * @deprecated (KIS에 요청하는 것이 아닌 크롤링을 통해 주가데이터를 받아올 예정)
      */
     @Transactional
+    @Deprecated(since = "2023/02/24")
     public synchronized void createManyStockInfoPrices(List<String> stockCodeList) {
+        final int DELTA = 4000;
         LocalDateTime now = holidayService.checkAvailableDate();
 
         for (String code : stockCodeList) {
@@ -64,10 +67,10 @@ public class StockInfoPriceService {
                     delta = Duration.between(date, now).toDays();
 
                 } else {
-                    delta = 8000; // 약 22년 치
+                    delta = DELTA; // 약 22년 치
                 }
             } else {
-                delta = 8000;
+                delta = DELTA;
             }
 
             LocalDateTime tempNow = now.plusDays(1);
@@ -103,8 +106,10 @@ public class StockInfoPriceService {
      * @param start     일봉 데이터 시작일
      * @param end       일봉 데이터 마지막일
      * @return boolean
+     * @deprecated (KIS에 요청하는 것이 아닌 크롤링을 통해 주가데이터를 받아올 예정)
      */
     @Transactional
+    @Deprecated(since = "2023/02/24")
     public boolean createStockInfoPrice(String stockCode, LocalDateTime start, LocalDateTime end) {
 
         Map<String, String> reqHeaders = new HashMap<>();
@@ -193,8 +198,11 @@ public class StockInfoPriceService {
     /**
      * 신규 상장된 종목의 StockInfo, 일봉데이터를 넣는다.
      * createStockInfoPrice() 함수를 통해 데이터를 넣을 수도 있지만 신규 상장된 목록을 따로 보기위해 만들었다.
+     *
+     * @deprecated (KIS에 요청하는 것이 아닌 크롤링을 통해 주가데이터를 받아올 예정)
      */
     @Transactional
+    @Deprecated(since = "2023/02/24")
     public void checkNewStock() {
         Set<String> codeSet = stockCodeRepository.findAll().stream().map(StockCode::getCode).collect(Collectors.toSet());
         Set<String> infoSet = stockInfoRepository.findAll().stream().map(StockInfo::getCode).collect(Collectors.toSet());

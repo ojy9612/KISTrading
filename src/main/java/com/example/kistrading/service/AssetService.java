@@ -1,8 +1,8 @@
 package com.example.kistrading.service;
 
 import com.example.kistrading.config.PropertiesMapping;
+import com.example.kistrading.domain.em.TradeMode;
 import com.example.kistrading.dto.AccountDataResDto;
-import com.example.kistrading.entity.em.TradeMode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;

@@ -1,8 +1,8 @@
 package com.example.kistrading.service;
 
 import com.example.kistrading.config.PropertiesMapping;
-import com.example.kistrading.entity.Token;
-import com.example.kistrading.repository.TokenRepository;
+import com.example.kistrading.domain.Token.entity.Token;
+import com.example.kistrading.domain.Token.repository.TokenRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

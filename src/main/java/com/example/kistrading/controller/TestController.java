@@ -1,9 +1,9 @@
 package com.example.kistrading.controller;
 
 import com.example.kistrading.config.PropertiesMapping;
-import com.example.kistrading.entity.StockInfo;
-import com.example.kistrading.entity.em.OrderType;
-import com.example.kistrading.repository.StockInfoRepository;
+import com.example.kistrading.domain.StockInfo.entity.StockInfo;
+import com.example.kistrading.domain.StockInfo.repository.StockInfoRepository;
+import com.example.kistrading.domain.em.OrderType;
 import com.example.kistrading.service.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

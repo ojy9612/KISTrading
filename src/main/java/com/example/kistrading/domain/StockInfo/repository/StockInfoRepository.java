@@ -1,6 +1,6 @@
-package com.example.kistrading.repository;
+package com.example.kistrading.domain.StockInfo.repository;
 
-import com.example.kistrading.entity.StockInfo;
+import com.example.kistrading.domain.StockInfo.entity.StockInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

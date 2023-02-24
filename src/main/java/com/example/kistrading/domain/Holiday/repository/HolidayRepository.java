@@ -1,6 +1,6 @@
-package com.example.kistrading.repository;
+package com.example.kistrading.domain.Holiday.repository;
 
-import com.example.kistrading.entity.Holiday;
+import com.example.kistrading.domain.Holiday.entity.Holiday;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

@@ -1,5 +1,7 @@
-package com.example.kistrading.entity;
+package com.example.kistrading.domain.StockInfo.entity;
 
+import com.example.kistrading.domain.StockPrice.entity.StockPrice;
+import com.example.kistrading.domain.TimeStamped;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

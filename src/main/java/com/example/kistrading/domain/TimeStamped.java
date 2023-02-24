@@ -1,4 +1,4 @@
-package com.example.kistrading.entity;
+package com.example.kistrading.domain;
 
 import lombok.Getter;
 import org.hibernate.annotations.Comment;

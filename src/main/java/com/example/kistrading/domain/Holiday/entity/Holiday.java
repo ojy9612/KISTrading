@@ -1,4 +1,4 @@
-package com.example.kistrading.entity;
+package com.example.kistrading.domain.Holiday.entity;
 
 import lombok.Builder;
 import lombok.Getter;

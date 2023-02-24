@@ -1,7 +1,8 @@
-package com.example.kistrading.entity;
+package com.example.kistrading.domain.Token.entity;
 
 
-import com.example.kistrading.entity.em.TradeMode;
+import com.example.kistrading.domain.TimeStamped;
+import com.example.kistrading.domain.em.TradeMode;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

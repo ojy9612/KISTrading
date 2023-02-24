@@ -1,7 +1,8 @@
-package com.example.kistrading.entity.em;
+package com.example.kistrading.domain.em;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 @NoArgsConstructor
@@ -12,7 +13,7 @@ public enum OrderType {
 
     private String name;
 
-    public static OrderType getEnum(String name) {
+    public static @Nullable OrderType getEnum(String name) {
         for (OrderType tradeMode : values()) {
             if (tradeMode.getName().equalsIgnoreCase(name)) {
                 return tradeMode;

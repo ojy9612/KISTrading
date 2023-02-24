@@ -1,9 +1,9 @@
 package com.example.kistrading.service;
 
 import com.example.kistrading.config.PropertiesMapping;
+import com.example.kistrading.domain.em.OrderType;
+import com.example.kistrading.domain.em.TradeMode;
 import com.example.kistrading.dto.OrderStockResDto;
-import com.example.kistrading.entity.em.OrderType;
-import com.example.kistrading.entity.em.TradeMode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;

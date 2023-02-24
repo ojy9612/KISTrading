@@ -1,4 +1,4 @@
-package com.example.kistrading.entity.em;
+package com.example.kistrading.domain.em;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

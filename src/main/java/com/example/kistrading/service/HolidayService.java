@@ -1,10 +1,11 @@
 package com.example.kistrading.service;
 
+import com.example.kistrading.domain.Holiday.entity.Holiday;
+import com.example.kistrading.domain.Holiday.repository.HolidayRepository;
 import com.example.kistrading.dto.HolidayResDto;
-import com.example.kistrading.entity.Holiday;
-import com.example.kistrading.repository.HolidayRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,7 +99,7 @@ public class HolidayService {
      * @param holiday 저장할 Holiday 객체
      */
     @Transactional
-    public void createHoliday(Holiday holiday) {
+    public void createHoliday(@NotNull Holiday holiday) {
         if (!this.isHoliday(holiday.getDate())) {
             holidayRepository.save(holiday);
         }
