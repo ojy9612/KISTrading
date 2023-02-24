@@ -97,4 +97,12 @@ public class WebClientConfig {
                 .baseUrl(url)
                 .build();
     }
+
+    @Bean
+    @Qualifier("WebClient")
+    public WebClient webClient() {
+        return WebClient.builder()
+                .codecs(configurer -> configurer.defaultCodecs().maxInMemorySize(1024 * 1024))
+                .build();
+    }
 }

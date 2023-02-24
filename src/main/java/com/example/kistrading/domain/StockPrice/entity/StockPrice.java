@@ -9,7 +9,7 @@ import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -22,7 +22,7 @@ public class StockPrice extends TimeStamped {
 
     @Column(nullable = false)
     @Comment("일자")
-    private LocalDateTime date;
+    private LocalDate date;
 
     @Column(nullable = false)
     @Comment("종가")
@@ -64,7 +64,7 @@ public class StockPrice extends TimeStamped {
     }
 
     @Builder
-    public StockPrice(LocalDateTime date, BigDecimal closePrice, BigDecimal openPrice, BigDecimal highPrice, BigDecimal lowPrice, Long volume, BigDecimal volumeTotalPrice, BigDecimal beforeGapPrice, String beforeGapPriceSign, StockInfo stockInfo) {
+    public StockPrice(LocalDate date, BigDecimal closePrice, BigDecimal openPrice, BigDecimal highPrice, BigDecimal lowPrice, Long volume, BigDecimal volumeTotalPrice, BigDecimal beforeGapPrice, String beforeGapPriceSign, StockInfo stockInfo) {
         this.date = date;
         this.closePrice = closePrice;
         this.openPrice = openPrice;

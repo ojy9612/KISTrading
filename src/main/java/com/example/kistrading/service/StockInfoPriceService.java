@@ -7,7 +7,6 @@ import com.example.kistrading.domain.StockInfo.entity.StockInfo;
 import com.example.kistrading.domain.StockInfo.repository.StockInfoRepository;
 import com.example.kistrading.domain.StockPrice.entity.StockPrice;
 import com.example.kistrading.domain.StockPrice.repository.StockPriceRepository;
-import com.example.kistrading.dto.StockCodeResDto;
 import com.example.kistrading.dto.StockInfoPriceResDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,6 @@ import java.util.stream.Collectors;
 public class StockInfoPriceService {
 
     private final WebClientKISConnector<StockInfoPriceResDto> webClientKISConnectorStockInfoPriceResDto;
-    private final WebClientDataGoKrConnector<StockCodeResDto> webClientDataGoKrConnectorStockCodeResDto;
     private final StockInfoRepository stockInfoRepository;
     private final StockPriceRepository stockPriceRepository;
     private final StockCodeRepository stockCodeRepository;
@@ -62,7 +60,7 @@ public class StockInfoPriceService {
                 StockInfo stockInfo = opCode.get();
                 List<StockPrice> stockPriceList = stockInfo.getStockPriceList();
                 if (!stockPriceList.isEmpty()) {
-                    date = stockPriceList.get(0).getDate();
+                    date = stockPriceList.get(0).getDate().atStartOfDay();
 
                     delta = Duration.between(date, now).toDays();
 
@@ -174,7 +172,7 @@ public class StockInfoPriceService {
                 }
 
                 stockPriceList.add(StockPrice.builder()
-                        .date(LocalDate.parse(output2.getStckBsopDate(), DateTimeFormatter.ofPattern("yyyyMMdd")).atStartOfDay())
+                        .date(LocalDate.parse(output2.getStckBsopDate(), DateTimeFormatter.ofPattern("yyyyMMdd")))
                         .closePrice(new BigDecimal(output2.getStckClpr()))
                         .openPrice(new BigDecimal(output2.getStckOprc()))
                         .highPrice(new BigDecimal(output2.getStckHgpr()))
@@ -220,56 +218,6 @@ public class StockInfoPriceService {
         }
     }
 
-    /**
-     * 상장된 모든 종목 코드를 업데이트, 생성 한다.
-     */
-    @Transactional
-    public void updateStockCode() {
-        int pageNo = 1;
-        int totalCount = Integer.MAX_VALUE;
-        List<StockCodeResDto.Item> bodyList = new ArrayList<>();
-        StockCodeResDto response;
-        String beforeDate = LocalDateTime.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
-        reqParam.set("resultType", "json");
-        reqParam.set("numOfRows", "1000");
-        reqParam.set("basDt", beforeDate);
-
-        while (totalCount > 1000 * (pageNo - 1)) {
-            reqParam.set("pageNo", String.valueOf(pageNo));
-            response = webClientDataGoKrConnectorStockCodeResDto.connect(HttpMethod.GET,
-                    "1160100/service/GetKrxListedInfoService/getItemInfo",
-                    null, reqParam, null, StockCodeResDto.class);
-
-            totalCount = response.getResponse().getBody().getTotalcount();
-            pageNo++;
-            bodyList.addAll(response.getResponse().getBody().getItems().getItem());
-        }
-
-        List<StockCode> stockCodeList = bodyList.stream().filter(item -> item.getMrktctg().equals("KOSDAQ") || item.getMrktctg().equals("KOSPI"))
-                .map(body -> StockCode.builder()
-                        .name(body.getItmsnm())
-                        .code(body.getSrtncd().substring(1))
-                        .market(body.getMrktctg())
-                        .build()
-                ).toList();
-
-        List<StockCode> all = stockCodeRepository.findAll();
-
-        List<StockCode> newStockCodeList = all.stream().filter(stockCode -> {
-            for (StockCode code : stockCodeList) {
-                if (code.getCode().equals(stockCode.getCode())) {
-                    if (!code.getName().equals(stockCode.getName()) || !code.getMarket().equals(stockCode.getName())) {
-                        stockCodeRepository.deleteByCode(code.getCode());
-                    }
-                    return false;
-                }
-            }
-            return true;
-        }).toList();
-
-        stockCodeRepository.saveAll(newStockCodeList);
-    }
 
     /**
      * DB에 저장된 모든 종목코드를 불러온다.

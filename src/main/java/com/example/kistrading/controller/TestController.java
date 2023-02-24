@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +33,9 @@ public class TestController {
     private final TokenService tokenService;
     private final AssetService assetService;
     private final StockInfoPriceService stockInfoPriceService;
+    private final StockCodeService stockCodeService;
     private final HolidayService holidayService;
+    private final NaverFinanceCrawlerService naverFinanceCrawlerService;
 
     private final StockInfoRepository stockInfoRepository;
 
@@ -87,7 +90,7 @@ public class TestController {
 
     @GetMapping("/test6")
     public void test6() {
-        stockInfoPriceService.updateStockCode();
+        stockCodeService.upsertStockCode();
     }
 
     @GetMapping("/test8")
@@ -113,6 +116,11 @@ public class TestController {
     @GetMapping("/test9")
     public void test9() {
         holidayService.createHolidaysByYear(2022);
+    }
+
+    @GetMapping("/test10")
+    public void test10() throws InterruptedException {
+        naverFinanceCrawlerService.crawlStockPrice("338220", LocalDate.now());
     }
 
 }

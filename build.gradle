@@ -33,6 +33,11 @@ dependencies {
 
 	//mac
 	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.86.Final:osx-aarch_64'
+
+	//crawler
+	implementation 'org.seleniumhq.selenium:selenium-java:4.1.1'
+	implementation 'org.seleniumhq.selenium:selenium-chrome-driver:4.1.1'
+
 }
 
 tasks.named('test') {

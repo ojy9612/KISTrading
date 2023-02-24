@@ -14,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Scheduler {
 
+    private final StockCodeService stockCodeService;
     private final StockInfoPriceService stockInfoPriceService;
     private final AssetService assetService;
     private final TradeService tradeService;
@@ -32,7 +33,7 @@ public class Scheduler {
 
         } else {
             log.info("오늘은 개장일 입니다.");
-            stockInfoPriceService.updateStockCode(); // 신규,수정 된 종목코드 불러오기
+            stockCodeService.upsertStockCode(); // 신규,수정 된 종목코드 불러오기
             stockInfoPriceService.createManyStockInfoPrices(stockInfoPriceService.getStockCodeList()); // 종가 업데이트
             stockInfoPriceService.checkNewStock(); // 신규 종목 업데이트
         }
