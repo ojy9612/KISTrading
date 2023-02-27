@@ -45,7 +45,7 @@ public class WebClientKISConnector<T> {
         try {
             String requestBodyJson = !body.isEmpty() ? objectMapper.writeValueAsString(body) : "";
 
-            if (timeQueue.size() >= 20) {
+            if (timeQueue.size() >= 19) {
                 while (true) {
                     if (timeQueue.isEmpty()) {
                         break;
@@ -94,7 +94,7 @@ public class WebClientKISConnector<T> {
         try {
             String requestBodyJson = !body.isEmpty() ? objectMapper.writeValueAsString(body) : "";
 
-            if (timeQueue.size() >= 20) {
+            if (timeQueue.size() >= 19) {
                 while (true) {
                     if (timeQueue.isEmpty()) {
                         break;

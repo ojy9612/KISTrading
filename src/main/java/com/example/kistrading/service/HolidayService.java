@@ -3,7 +3,6 @@ package com.example.kistrading.service;
 import com.example.kistrading.domain.Holiday.entity.Holiday;
 import com.example.kistrading.domain.Holiday.repository.HolidayRepository;
 import com.example.kistrading.dto.HolidayResDto;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpMethod;
@@ -12,10 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import javax.annotation.PostConstruct;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
@@ -26,22 +23,22 @@ public class HolidayService {
     private final WebClientDataGoKrConnector<HolidayResDto> webClientDataGoKrConnectorHolidayResDto;
     private final HolidayRepository holidayRepository;
 
-    @Getter
-    private LocalDateTime nowDate;
-    @Getter
-    private LocalDateTime availableDate;
 
-
-    @PostConstruct
+    /**
+     * 4시를 기준으로 유효한 날을 리턴함
+     *
+     * @return LocalDateTime
+     */
     @Transactional
-    public LocalDateTime checkAvailableDate() {
+    public LocalDate getAvailableDate() {
+        LocalDate nowDate;
         if (LocalTime.now().compareTo(LocalTime.of(16, 0)) < 0) {
-            nowDate = LocalDateTime.now().minusDays(1);
+            nowDate = LocalDate.now().minusDays(1);
         } else {
-            nowDate = LocalDateTime.now();
+            nowDate = LocalDate.now();
         }
 
-        availableDate = nowDate;
+        LocalDate availableDate = nowDate;
         while (this.isHoliday(availableDate)) {
             availableDate = availableDate.minusDays(1);
         }
@@ -72,7 +69,7 @@ public class HolidayService {
             if (item.getIsholiday().equals("Y")) {
                 this.createHoliday(Holiday.builder()
                         .name(item.getDatename())
-                        .date(LocalDate.parse(String.valueOf(item.getLocdate()), DateTimeFormatter.ofPattern("yyyyMMdd")).atStartOfDay())
+                        .date(LocalDate.parse(String.valueOf(item.getLocdate()), DateTimeFormatter.ofPattern("yyyyMMdd")))
                         .build());
             }
 
@@ -85,7 +82,7 @@ public class HolidayService {
                     || date.getDayOfWeek().getValue() == DayOfWeek.SATURDAY.getValue()) {
                 this.createHoliday(Holiday.builder()
                         .name(date.getDayOfWeek().name())
-                        .date(date.atStartOfDay())
+                        .date(date)
                         .build());
             }
 
@@ -112,8 +109,24 @@ public class HolidayService {
      * @return boolean
      */
     @Transactional(readOnly = true)
-    public boolean isHoliday(LocalDateTime date) {
+    public boolean isHoliday(LocalDate date) {
         return holidayRepository.findByDate(date).isPresent();
+    }
+
+    /**
+     * 공휴일이 아닌 전일 날짜를 가져온다.
+     *
+     * @return LocalDateTime
+     */
+    @Transactional(readOnly = true)
+    public LocalDate deltaOneDayNoHoliday() {
+        LocalDate now = LocalDate.now().minusDays(1);
+
+        while (this.isHoliday(now)) {
+            now = now.minusDays(1);
+        }
+
+        return now;
     }
 
 }

@@ -15,17 +15,18 @@ import javax.persistence.*;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
+@Table(name = "stock_code", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "name"}))
 public class StockCode extends TimeStamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @Comment("종목 이름")
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @Comment("종목 코드")
     private String code;
 

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Entity
@@ -22,10 +22,10 @@ public class Holiday {
 
     @Column(nullable = false)
     @Comment("공휴일 날짜")
-    private LocalDateTime date;
+    private LocalDate date;
 
     @Builder
-    public Holiday(String name, LocalDateTime date) {
+    public Holiday(String name, LocalDate date) {
         this.name = name;
         this.date = date;
     }

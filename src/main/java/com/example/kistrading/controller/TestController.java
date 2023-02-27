@@ -1,7 +1,7 @@
 package com.example.kistrading.controller;
 
 import com.example.kistrading.config.PropertiesMapping;
-import com.example.kistrading.domain.StockInfo.entity.StockInfo;
+import com.example.kistrading.domain.StockCode.entity.StockCode;
 import com.example.kistrading.domain.StockInfo.repository.StockInfoRepository;
 import com.example.kistrading.domain.em.OrderType;
 import com.example.kistrading.service.*;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,7 @@ public class TestController {
     private final TradeService tradeService;
     private final TokenService tokenService;
     private final AssetService assetService;
-    private final StockInfoPriceService stockInfoPriceService;
+    private final StockInfoService stockInfoService;
     private final StockCodeService stockCodeService;
     private final HolidayService holidayService;
     private final NaverFinanceCrawlerService naverFinanceCrawlerService;
@@ -85,7 +84,13 @@ public class TestController {
 
     @GetMapping("/test5")
     public void test5() {
-        stockInfoPriceService.createStockInfoPrice("007680", LocalDateTime.now(), LocalDateTime.now());
+        LocalDate nowDate = holidayService.getAvailableDate();
+        List<String> stockCodeList = stockCodeService.getStockCodeList().stream().map(StockCode::getCode).toList();
+
+        for (String stockCode : stockCodeList) {
+            stockInfoService.upsertStockInfo(stockCode, nowDate.minusDays(1), nowDate);
+        }
+
     }
 
     @GetMapping("/test6")
@@ -95,31 +100,16 @@ public class TestController {
 
     @GetMapping("/test8")
     public void test8() {
-        List<String> codes = stockInfoRepository.findAll().stream().map(StockInfo::getCode).toList();
-
-        int bifurcation = 1200;
-
-        for (int i = 0; i < bifurcation; i++) {
-            log.info("현재 bifurcation: " + i + "/" + bifurcation);
-            stockInfoPriceService.createManyStockInfoPrices(
-                    codes.subList(i * (codes.size() / bifurcation), (i + 1) * (codes.size() / bifurcation)));
-        }
-        if ((codes.size() % bifurcation) != 0) {
-            log.info("마지막 작업중 ... ");
-            stockInfoPriceService.createManyStockInfoPrices(
-                    codes.subList((codes.size() / bifurcation) * bifurcation, codes.size() - 1));
-        }
-        log.info("마지막 끝 ");
 
     }
 
     @GetMapping("/test9")
     public void test9() {
-        holidayService.createHolidaysByYear(2022);
+        holidayService.createHolidaysByYear(2023);
     }
 
     @GetMapping("/test10")
-    public void test10() throws InterruptedException {
+    public void test10() {
         naverFinanceCrawlerService.crawlStockPrice("338220", LocalDate.now());
     }
 

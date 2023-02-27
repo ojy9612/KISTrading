@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,6 +16,9 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+@DynamicInsert
+@DynamicUpdate
+@Table(name = "stock_info", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "name"}))
 public class StockInfo extends TimeStamped {
 
 
@@ -21,11 +26,11 @@ public class StockInfo extends TimeStamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @Comment("주식 이름")
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @Comment("주식 코드")
     private String code;
 
@@ -84,17 +89,4 @@ public class StockInfo extends TimeStamped {
         this.eps = eps;
     }
 
-    @Builder(builderMethodName = "updateBuilder")
-    public void updateStockInfo(String name, String code, String otherCode, String fcam, Long amount, String marketCapitalization, String capital, String per, String pbr, String eps) {
-        this.name = name;
-        this.code = code;
-        this.otherCode = otherCode;
-        this.fcam = fcam;
-        this.amount = amount;
-        this.marketCapitalization = marketCapitalization;
-        this.capital = capital;
-        this.per = per;
-        this.pbr = pbr;
-        this.eps = eps;
-    }
 }

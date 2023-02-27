@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StockCodeService {
     private final StockCodeRepository stockCodeRepository;
+    private final HolidayService holidayService;
 
     private final WebClientDataGoKrConnector<StockCodeResDto> webClientDataGoKrConnectorStockCodeResDto;
 
@@ -31,7 +31,7 @@ public class StockCodeService {
         int totalCount = Integer.MAX_VALUE;
         List<StockCodeResDto.Item> bodyList = new ArrayList<>();
         StockCodeResDto response;
-        String beforeDate = LocalDateTime.now().minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String beforeDate = holidayService.deltaOneDayNoHoliday().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
         reqParam.set("resultType", "json");
         reqParam.set("numOfRows", "1000");
@@ -57,5 +57,15 @@ public class StockCodeService {
                 ).toList();
 
         stockCodeRepository.saveAll(stockCodeList);
+    }
+
+    /**
+     * DB에 저장된 모든 종목코드를 불러온다.
+     *
+     * @return List<String> 종목코드 List
+     */
+    @Transactional(readOnly = true)
+    public List<StockCode> getStockCodeList() {
+        return stockCodeRepository.findAll();
     }
 }

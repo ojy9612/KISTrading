@@ -14,13 +14,14 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(name = "stock_price", uniqueConstraints = @UniqueConstraint(columnNames = {"date"}))
 public class StockPrice extends TimeStamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @Comment("일자")
     private LocalDate date;
 
