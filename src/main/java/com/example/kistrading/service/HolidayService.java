@@ -5,6 +5,7 @@ import com.example.kistrading.domain.Holiday.repository.HolidayRepository;
 import com.example.kistrading.dto.HolidayResDto;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ public class HolidayService {
      *
      * @return LocalDateTime
      */
+    @Cacheable(value = "availableDate")
     @Transactional
     public LocalDate getAvailableDate() {
         LocalDate nowDate;
@@ -118,9 +120,27 @@ public class HolidayService {
      *
      * @return LocalDateTime
      */
+    @Cacheable(value = "deltaOneDay")
     @Transactional(readOnly = true)
-    public LocalDate deltaOneDayNoHoliday() {
+    public LocalDate deltaOneAvailableDate() {
         LocalDate now = LocalDate.now().minusDays(1);
+
+        while (this.isHoliday(now)) {
+            now = now.minusDays(1);
+        }
+
+        return now;
+    }
+
+    /**
+     * 공휴일이 아닌 전일 날짜를 가져온다.
+     *
+     * @return LocalDateTime
+     */
+    @Cacheable(value = "deltaTwoDay")
+    @Transactional(readOnly = true)
+    public LocalDate deltaTwoAvailableDate() {
+        LocalDate now = this.deltaOneAvailableDate().minusDays(1);
 
         while (this.isHoliday(now)) {
             now = now.minusDays(1);

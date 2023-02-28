@@ -13,6 +13,7 @@ import org.springframework.util.MultiValueMap;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class StockCodeService {
         int totalCount = Integer.MAX_VALUE;
         List<StockCodeResDto.Item> bodyList = new ArrayList<>();
         StockCodeResDto response;
-        String beforeDate = holidayService.deltaOneDayNoHoliday().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String beforeDate = holidayService.deltaTwoAvailableDate().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
         reqParam.set("resultType", "json");
         reqParam.set("numOfRows", "1000");
@@ -55,6 +56,29 @@ public class StockCodeService {
                         .market(body.getMrktctg())
                         .build()
                 ).toList();
+
+        for (StockCodeResDto.Item item : bodyList) {
+            if (item.getMrktctg().equals("KOSDAQ") || item.getMrktctg().equals("KOSPI")) {
+                String name = item.getItmsnm();
+                String code = item.getSrtncd().substring(1);
+                String market = item.getMrktctg();
+                Optional<StockCode> stockCodeOptional = stockCodeRepository.findByCode(code);
+
+                if (stockCodeOptional.isEmpty()) {
+                    StockCode stockCode = StockCode.builder()
+                            .name(name)
+                            .code(code)
+                            .market(market)
+                            .build();
+                    stockCodeRepository.save(stockCode);
+                } else {
+                    stockCodeOptional.get().updateStockCodeBuilder()
+                            .market(market)
+                            .build();
+                }
+
+            }
+        }
 
         stockCodeRepository.saveAll(stockCodeList);
     }

@@ -3,6 +3,8 @@ package com.example.kistrading.service;
 import com.example.kistrading.dto.AccountDataResDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -18,7 +20,12 @@ public class Scheduler {
     private final AssetService assetService;
     private final TradeService tradeService;
     private final HolidayService holidayService;
-    
+
+    @Scheduled(cron = "0 0 16 * * *")
+    @Scheduled(cron = "0 0 0 * * *")
+    @CacheEvict(value = {"deltaOneDay", "deltaTwoDay", "availableDate"})
+    public void evictCache() {
+    }
 
     /* 초 분 시 일 월 요일, [참고문서:https://zamezzz.tistory.com/197] */
 //    @Scheduled(cron = "0 0 6 * * ?") // 매일 오전 6시에 실행

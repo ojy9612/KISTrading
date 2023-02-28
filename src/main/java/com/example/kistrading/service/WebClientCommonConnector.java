@@ -43,7 +43,8 @@ public class WebClientCommonConnector<T> {
         try {
             String requestBodyJson = !body.isEmpty() ? objectMapper.writeValueAsString(body) : "";
 
-            wait(1000);
+            Thread.sleep(1000);
+            this.wait(1000);
 
             ResponseEntity<T> block = webClient.method(methodType)
                     .uri(uriBuilder -> uriBuilder

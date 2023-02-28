@@ -51,7 +51,7 @@ public class WebClientKISConnector<T> {
                         break;
                     }
                     if (timeQueue.peek().plusSeconds(1).isAfter(LocalDateTime.now())) {
-                        this.wait(Duration.between(timeQueue.poll(), LocalDateTime.now()).toMillis());
+                        this.wait(Duration.between(Objects.requireNonNull(timeQueue.poll()), LocalDateTime.now()).toMillis());
                         break;
                     } else {
                         timeQueue.poll();
@@ -100,7 +100,7 @@ public class WebClientKISConnector<T> {
                         break;
                     }
                     if (timeQueue.peek().plusSeconds(1).isAfter(LocalDateTime.now())) {
-                        this.wait(Duration.between(timeQueue.poll(), LocalDateTime.now()).toMillis());
+                        this.wait(Duration.between(Objects.requireNonNull(timeQueue.poll()), LocalDateTime.now()).toMillis());
                         break;
                     } else {
                         timeQueue.poll();

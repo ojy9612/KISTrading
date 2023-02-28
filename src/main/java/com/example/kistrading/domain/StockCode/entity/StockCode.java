@@ -15,7 +15,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @DynamicUpdate
 @DynamicInsert
-@Table(name = "stock_code", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "name"}))
+@Table(name = "stock_code", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_stock_info_name", columnNames = {"name"}),
+        @UniqueConstraint(name = "UK_stock_info_code", columnNames = {"code"})
+})
 public class StockCode extends TimeStamped {
 
     @Id
@@ -40,5 +43,10 @@ public class StockCode extends TimeStamped {
         this.code = code;
         this.market = market;
     }
-    
+
+    @Builder(builderMethodName = "updateStockCodeBuilder")
+    public void updateStockCode(String market) {
+        this.market = market;
+    }
+
 }

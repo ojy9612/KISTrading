@@ -16,10 +16,7 @@ import org.springframework.util.MultiValueMap;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,6 +39,7 @@ public class StockInfoService {
      * @param start     일봉 데이터 시작일
      * @param end       일봉 데이터 마지막일
      */
+    // TODO: n+1 문제 해결
     @Transactional
     public void upsertStockInfo(String stockCode, LocalDate start, LocalDate end) {
 
@@ -66,19 +64,37 @@ public class StockInfoService {
         if (response.getRtCd().equals("0")) {
             StockInfoPriceResDto.Output1 output1 = response.getOutput1();
 
-            StockInfo stockInfo = StockInfo.builder()
-                    .name(output1.getHtsKorIsnm())
-                    .code(stockCode)
-                    .otherCode(output1.getStckShrnIscd())
-                    .fcam(output1.getStckFcam())
-                    .amount(Long.valueOf(output1.getLstnStcn()))
-                    .marketCapitalization(output1.getHtsAvls())
-                    .capital(output1.getCpfn())
-                    .per(output1.getPer())
-                    .pbr(output1.getPbr())
-                    .eps(output1.getEps())
-                    .build();
-            stockInfoRepository.save(stockInfo);
+            Optional<StockInfo> stockInfoOptional = stockInfoRepository.findByCode(stockCode);
+
+            StockInfo stockInfo;
+            if (stockInfoOptional.isEmpty()) {
+                stockInfo = StockInfo.builder()
+                        .name(output1.getHtsKorIsnm())
+                        .code(stockCode)
+                        .otherCode(output1.getStckShrnIscd())
+                        .fcam(output1.getStckFcam())
+                        .amount(Long.valueOf(output1.getLstnStcn()))
+                        .marketCapitalization(output1.getHtsAvls())
+                        .capital(output1.getCpfn())
+                        .per(output1.getPer())
+                        .pbr(output1.getPbr())
+                        .eps(output1.getEps())
+                        .build();
+                stockInfoRepository.save(stockInfo);
+            } else {
+                stockInfo = stockInfoOptional.get();
+                stockInfo.updateStockInfoBuilder()
+                        .otherCode(output1.getStckShrnIscd())
+                        .fcam(output1.getStckFcam())
+                        .amount(Long.valueOf(output1.getLstnStcn()))
+                        .marketCapitalization(output1.getHtsAvls())
+                        .capital(output1.getCpfn())
+                        .per(output1.getPer())
+                        .pbr(output1.getPbr())
+                        .eps(output1.getEps())
+                        .build();
+            }
+
 
         } else {
             throw new RuntimeException("KIS 통신 에러" + response.getRtCd() + response.getMsg1() + response.getMsgCd());

@@ -84,11 +84,11 @@ public class TestController {
 
     @GetMapping("/test5")
     public void test5() {
-        LocalDate nowDate = holidayService.getAvailableDate();
         List<String> stockCodeList = stockCodeService.getStockCodeList().stream().map(StockCode::getCode).toList();
 
         for (String stockCode : stockCodeList) {
-            stockInfoService.upsertStockInfo(stockCode, nowDate.minusDays(1), nowDate);
+            stockInfoService.upsertStockInfo(stockCode, holidayService.deltaOneAvailableDate(), holidayService.deltaTwoAvailableDate());
+            naverFinanceCrawlerService.crawlStockPrice(stockCode, holidayService.getAvailableDate());
         }
 
     }

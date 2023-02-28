@@ -7,6 +7,7 @@ import com.example.kistrading.domain.StockPrice.repository.StockPriceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -27,7 +28,8 @@ public class NaverFinanceCrawlerService {
     private final StockPriceRepository stockPriceRepository;
     private final StockInfoRepository stockInfoRepository;
 
-    public void crawlStockPrice(String stockCode, LocalDate stdDay){
+    @Transactional
+    public void crawlStockPrice(String stockCode, LocalDate stdDay) {
         String symbol = stockCode;
         String requestType = "2";
         int count = 5000;
@@ -51,6 +53,7 @@ public class NaverFinanceCrawlerService {
         if (m.find()) {
             m.group(1);
         }
+        StockPrice stockPrice = null;
         while (m.find()) {
             String[] items = m.group(1).split(",");
             List<Object> row = new ArrayList<>();
@@ -60,19 +63,18 @@ public class NaverFinanceCrawlerService {
 
                 if (i == 0) {
                     row.add(LocalDate.parse(item, DateTimeFormatter.ofPattern("yyyyMMdd")));
-                } else if(items.length - 2 == i) {
+                } else if (items.length - 2 == i) {
                     row.add(Long.parseLong(item));
-                }else{
+                } else {
                     row.add(new BigDecimal(item));
                 }
             }
 
             try {
-
                 StockInfo stockInfo = stockInfoRepository.findByCode(stockCode).orElseThrow(
                         IllegalArgumentException::new);
 
-                StockPrice.builder()
+                stockPrice = StockPrice.builder()
                         .date((LocalDate) row.get(0))
                         .closePrice((BigDecimal) row.get(4))
                         .openPrice((BigDecimal) row.get(1))
@@ -81,11 +83,14 @@ public class NaverFinanceCrawlerService {
                         .volume((Long) row.get(5))
                         .stockInfo(stockInfo)
                         .build();
-            } catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("id가 없습니다. " + stockCode);
             }
         }
 
+        // TODO: 값이 null인 경우 해결
+
+        stockPriceRepository.save(stockPrice);
     }
 
 

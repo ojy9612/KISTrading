@@ -18,7 +18,10 @@ import java.util.List;
 @NoArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "stock_info", uniqueConstraints = @UniqueConstraint(columnNames = {"code", "name"}))
+@Table(name = "stock_info", uniqueConstraints = {
+        @UniqueConstraint(name = "UK_stock_info_name", columnNames = {"name"}),
+        @UniqueConstraint(name = "UK_stock_info_code", columnNames = {"code"})
+})
 public class StockInfo extends TimeStamped {
 
 
@@ -88,5 +91,18 @@ public class StockInfo extends TimeStamped {
         this.pbr = pbr;
         this.eps = eps;
     }
+
+    @Builder(builderMethodName = "updateStockInfoBuilder")
+    public void updateStockInfo(String otherCode, String fcam, Long amount, String marketCapitalization, String capital, String per, String pbr, String eps) {
+        this.otherCode = otherCode;
+        this.fcam = fcam;
+        this.amount = amount;
+        this.marketCapitalization = marketCapitalization;
+        this.capital = capital;
+        this.per = per;
+        this.pbr = pbr;
+        this.eps = eps;
+    }
+
 
 }
