@@ -1,10 +1,18 @@
 package com.example.kistrading.controller;
 
 import com.example.kistrading.config.PropertiesMapping;
-import com.example.kistrading.domain.StockCode.entity.StockCode;
-import com.example.kistrading.domain.StockInfo.repository.StockInfoRepository;
-import com.example.kistrading.domain.em.OrderType;
-import com.example.kistrading.service.*;
+import com.example.kistrading.domain.common.em.OrderType;
+import com.example.kistrading.domain.common.service.AssetService;
+import com.example.kistrading.domain.common.service.NaverFinanceCrawlerService;
+import com.example.kistrading.domain.common.service.TradeService;
+import com.example.kistrading.domain.common.service.WebClientKISConnector;
+import com.example.kistrading.domain.holiday.service.HolidayService;
+import com.example.kistrading.domain.stockcode.entity.StockCode;
+import com.example.kistrading.domain.stockcode.service.StockCodeService;
+import com.example.kistrading.domain.stockinfo.repository.StockInfoRepository;
+import com.example.kistrading.domain.stockinfo.service.StockInfoService;
+import com.example.kistrading.domain.stockprice.service.StockPriceService;
+import com.example.kistrading.domain.token.service.TokenService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,7 +23,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +44,7 @@ public class TestController {
     private final NaverFinanceCrawlerService naverFinanceCrawlerService;
 
     private final StockInfoRepository stockInfoRepository;
+    private final StockPriceService stockPriceService;
 
     private final ObjectMapper objectMapper;
 
@@ -86,10 +94,10 @@ public class TestController {
     public void test5() {
         List<String> stockCodeList = stockCodeService.getStockCodeList().stream().map(StockCode::getCode).toList();
 
-        for (String stockCode : stockCodeList) {
-            stockInfoService.upsertStockInfo(stockCode, holidayService.deltaOneAvailableDate(), holidayService.deltaTwoAvailableDate());
-            naverFinanceCrawlerService.crawlStockPrice(stockCode, holidayService.getAvailableDate());
-        }
+//        stockInfoService.upsertStockInfo(stockCodeList, holidayService.deltaOneAvailableDate(), holidayService.deltaTwoAvailableDate());
+
+        stockPriceService.upsertStockPrice(stockCodeList, holidayService.getAvailableDate());
+
 
     }
 
@@ -110,7 +118,7 @@ public class TestController {
 
     @GetMapping("/test10")
     public void test10() {
-        naverFinanceCrawlerService.crawlStockPrice("338220", LocalDate.now());
+
     }
 
 }
