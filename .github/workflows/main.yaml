@@ -66,4 +66,4 @@ jobs:
           file: ./Dockerfile # Dockerfile path
           platforms: linux/amd64 # m1에서는 - linux/arm64/v8
           push: true
-          tags: ojy9612/${{ github.event.repository.name }} # username/imagename:tagname  tagname 생략 시 latest로 입력됨.
+          tags: ojy9612/${{ github.event.repository.name }}:1.0 # username/imagename:tagname  tagname 생략 시 latest로 입력됨.
