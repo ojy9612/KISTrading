@@ -2,9 +2,9 @@ name: Java CI with Gradle
 
 on:
   pull_request:
-    branches: [ "main" ]  # main로 PR시 Actions 작동
-#   push:
-#     branches: [ "master" ]  # master로 push시 Actions 작동
+    branches: [ "main" ]  
+  push:
+    branches: [ "main" ] 
 
 jobs:
   build:
