@@ -64,5 +64,5 @@ jobs:
           context: .  # base folder
           file: ./Dockerfile # Dockerfile path
           platforms: linux/amd64 # m1에서는 - linux/arm64/v8
-          push: true                                       # github 저장소 명으로 도커 imagename 설정
+          push: true
           tags: ojy9612/${{ github.event.repository.name }} # username/imagename:tagname  tagname 생략 시 latest로 입력됨.
