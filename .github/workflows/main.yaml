@@ -59,7 +59,11 @@ jobs:
         with:
           username: ojy9612
           password: ${{ secrets.DOCKER_PWD }}
-
+          
+      - name: Create Tag Name
+        run: echo ::set-output name=tag::$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+        id: set_tag_name
+  
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
@@ -67,4 +71,4 @@ jobs:
           file: ./Dockerfile # Dockerfile path
           platforms: linux/amd64 # m1에서는 - linux/arm64/v8
           push: true
-          tags: ojy9612/${{ github.event.repository.name | lower }}:1.0 # username/imagename:tagname  tagname 생략 시 latest로 입력됨.
+          tags: ojy9612/${{ steps.set_tag_name.outputs.tag }}:1.0 # username/imagename:tagname  tagname 생략 시 latest로 입력됨.
