@@ -18,7 +18,10 @@ import org.springframework.util.MultiValueMap;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,8 +53,8 @@ public class StockInfoService {
             stockInfoMap.put(stockInfo.getCode(), stockInfo);
         }
 
-        List<StockInfo> stockInfoListForSave = new ArrayList<>();
         for (String stockCode : stockCodeList) {
+            log.info(stockCode + " 시작");
             /* KIS API 를 통해 주식정보를 가져옴 */
             Map<String, String> reqHeaders = new HashMap<>();
             MultiValueMap<String, String> reqParams = new LinkedMultiValueMap<>();
@@ -79,7 +82,7 @@ public class StockInfoService {
                 StockInfo stockInfo = stockInfoMap.getOrDefault(stockCode, null);
 
                 if (stockInfo == null) {
-                    stockInfoListForSave.add(StockInfo.builder()
+                    stockInfoRepository.save(StockInfo.builder()
                             .name(output1.getHtsKorIsnm())
                             .code(stockCode)
                             .otherCode(output1.getStckShrnIscd())
@@ -108,8 +111,6 @@ public class StockInfoService {
             }
             /* ----- */
         }
-
-        stockInfoRepository.saveAll(stockInfoListForSave);
     }
 
     /**

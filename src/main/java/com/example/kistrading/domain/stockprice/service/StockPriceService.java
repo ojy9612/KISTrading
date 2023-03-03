@@ -8,10 +8,10 @@ import com.example.kistrading.domain.stockprice.repository.StockPriceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +35,7 @@ public class StockPriceService {
      * @param stockCodeList stockCodeList
      * @param stdDay        기준 일자
      */
+    @Transactional
     public void upsertStockPrice(List<String> stockCodeList, LocalDate stdDay) {
         /* n+1 문제를 해결하기 위해 전체 데이터를 받아온 뒤 Map에 넣는다. */
         List<StockInfo> stockInfoList = stockInfoService.getStockInfoList(stockCodeList);
@@ -49,72 +50,73 @@ public class StockPriceService {
         }
         /* ----- */
 
-        List<StockPrice> stockPriceListForSave = new ArrayList<>();
         for (String stockCode : stockCodeList) {
-            log.info(stockCode + " 시작 : " + LocalDateTime.now());
-            StockInfo stockInfo = stockInfoMap.getOrDefault(stockCode, null);
+            try {
+                log.info(stockCode + " 시작");
+                StockInfo stockInfo = stockInfoMap.getOrDefault(stockCode, null);
 
-            // stockCode에 해당하는 StockInfo가 DB에 없으므로 무시
-            if (stockInfo == null) {
-                continue;
-            }
+                // stockCode에 해당하는 StockInfo가 DB에 없으므로 무시
+                if (stockInfo == null) {
+                    continue;
+                }
 
-            String result = naverFinanceCrawlerService.crawlStockPrice(stockCode, stdDay);
+                String result = naverFinanceCrawlerService.crawlStockPrice(stockCode, stdDay, 5000);
 
-            /* 받아온 데이터를 형식에 맞게 추출 후 db에 저장 */
-            Pattern p = Pattern.compile("\\[([^\\[\\]]*)]");
-            Matcher m = p.matcher(result);
+                /* 받아온 데이터를 형식에 맞게 추출 후 db에 저장 */
+                Pattern p = Pattern.compile("\\[([^\\[\\]]*)]");
+                Matcher m = p.matcher(result);
 
-            // 첫 번째 라인 스킵
-            if (m.find()) {
-                m.group(1);
-            }
+                // 첫 번째 라인 스킵
+                if (m.find()) {
+                    m.group(1);
+                }
 
-            while (m.find()) {
-                String[] items = m.group(1).split(",");
-                List<Object> row = new ArrayList<>();
+                while (m.find()) {
+                    String[] items = m.group(1).split(",");
+                    List<Object> row = new ArrayList<>();
 
-                for (int i = 0; i < items.length - 1; i++) {
-                    String item = items[i].replaceAll("[^0-9.+-]", "");
+                    for (int i = 0; i < items.length - 1; i++) {
+                        String item = items[i].replaceAll("[^0-9.+-]", "");
 
-                    if (i == 0) {
-                        row.add(LocalDate.parse(item, DateTimeFormatter.ofPattern("yyyyMMdd")));
-                    } else if (items.length - 2 == i) {
-                        row.add(Long.parseLong(item));
+                        if (i == 0) {
+                            row.add(LocalDate.parse(item, DateTimeFormatter.ofPattern("yyyyMMdd")));
+                        } else if (items.length - 2 == i) {
+                            row.add(Long.parseLong(item));
+                        } else {
+                            row.add(new BigDecimal(item));
+                        }
+                    }
+
+                    LocalDate date = (LocalDate) row.get(0);
+                    StockPrice stockPrice = stockPriceMap.getOrDefault(stockCode + date, null);
+
+                    if (stockPrice == null) {
+                        stockPriceRepository.save(StockPrice.builder()
+                                .date(date)
+                                .closePrice((BigDecimal) row.get(4))
+                                .openPrice((BigDecimal) row.get(1))
+                                .highPrice((BigDecimal) row.get(2))
+                                .lowPrice((BigDecimal) row.get(3))
+                                .volume((Long) row.get(5))
+                                .stockInfo(stockInfo)
+                                .build());
                     } else {
-                        row.add(new BigDecimal(item));
+                        stockPrice.updateStockPriceBuilder()
+                                .date(date)
+                                .closePrice((BigDecimal) row.get(4))
+                                .openPrice((BigDecimal) row.get(1))
+                                .highPrice((BigDecimal) row.get(2))
+                                .lowPrice((BigDecimal) row.get(3))
+                                .volume((Long) row.get(5))
+                                .stockInfo(stockInfo)
+                                .build();
                     }
                 }
-
-                LocalDate date = (LocalDate) row.get(0);
-                StockPrice stockPrice = stockPriceMap.getOrDefault(stockCode + date, null);
-
-                if (stockPrice == null) {
-                    stockPriceListForSave.add(StockPrice.builder()
-                            .date(date)
-                            .closePrice((BigDecimal) row.get(4))
-                            .openPrice((BigDecimal) row.get(1))
-                            .highPrice((BigDecimal) row.get(2))
-                            .lowPrice((BigDecimal) row.get(3))
-                            .volume((Long) row.get(5))
-                            .stockInfo(stockInfo)
-                            .build());
-                } else {
-                    stockPrice.updateStockPriceBuilder()
-                            .date(date)
-                            .closePrice((BigDecimal) row.get(4))
-                            .openPrice((BigDecimal) row.get(1))
-                            .highPrice((BigDecimal) row.get(2))
-                            .lowPrice((BigDecimal) row.get(3))
-                            .volume((Long) row.get(5))
-                            .stockInfo(stockInfo)
-                            .build();
-                }
-
+                /* ----- */
+            } catch (Exception e) {
+                log.error(stockCode + " 에서 에러 발생 \n" + e.getMessage());
             }
-            /* ----- */
         }
 
-        stockPriceRepository.saveAll(stockPriceListForSave);
     }
 }

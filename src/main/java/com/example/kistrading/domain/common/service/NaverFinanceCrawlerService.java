@@ -27,17 +27,15 @@ public class NaverFinanceCrawlerService {
      * @return 비정형 주가 데이터 반환 ([] 형식)
      */
     @Transactional
-    public String crawlStockPrice(String stockCode, LocalDate stdDay) {
+    public String crawlStockPrice(String stockCode, LocalDate stdDay, int count) {
         /* naver api로 주가 데이터 요청 */
-        String symbol = stockCode;
         String requestType = "2";
-        int count = 5000;
         String startTime = stdDay.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String timeframe = "day";
 
         MultiValueMap<String, String> reqParam = new LinkedMultiValueMap<>();
 
-        reqParam.add("symbol", symbol);
+        reqParam.add("symbol", stockCode);
         reqParam.add("requestType", requestType);
         reqParam.add("count", String.valueOf(count));
         reqParam.add("startTime", startTime);

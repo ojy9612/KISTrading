@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -14,6 +16,8 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @NoArgsConstructor
+@DynamicInsert
+@DynamicUpdate
 @Table(name = "stock_price", indexes = {
         @Index(name = "date_index", columnList = "date")
 })
@@ -27,19 +31,19 @@ public class StockPrice extends TimeStamped {
     @Comment("일자")
     private LocalDate date;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 12)
     @Comment("종가")
     private BigDecimal closePrice;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 12)
     @Comment("시가")
     private BigDecimal openPrice;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 12)
     @Comment("고가")
     private BigDecimal highPrice;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 12)
     @Comment("저가")
     private BigDecimal lowPrice;
 
@@ -47,11 +51,11 @@ public class StockPrice extends TimeStamped {
     @Comment("거래량")
     private Long volume;
 
-    @Column
+    @Column(precision = 15)
     @Comment("거래 대금")
     private BigDecimal volumeTotalPrice;
 
-    @Column
+    @Column(precision = 12)
     @Comment("전일 대비 상승폭")
     private BigDecimal beforeGapPrice;
 

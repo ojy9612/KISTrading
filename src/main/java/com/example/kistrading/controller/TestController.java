@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 @Slf4j
 @RestController
@@ -93,10 +94,16 @@ public class TestController {
     @GetMapping("/test5")
     public void test5() {
         List<String> stockCodeList = stockCodeService.getStockCodeList().stream().map(StockCode::getCode).toList();
+        int partitionSize = stockCodeList.size() / 10;
+        List<List<String>> partitionedList = IntStream.range(0, 10)
+                .mapToObj(i -> stockCodeList.subList(i * partitionSize, i == 9 ? stockCodeList.size() : (i + 1) * partitionSize)).toList();
 
 //        stockInfoService.upsertStockInfo(stockCodeList, holidayService.deltaOneAvailableDate(), holidayService.deltaTwoAvailableDate());
 
-        stockPriceService.upsertStockPrice(stockCodeList, holidayService.getAvailableDate());
+        for (int i = 0; i < partitionedList.size(); i++) {
+            log.info((i + 1) + "번째 시작 / " + 10);
+            stockPriceService.upsertStockPrice(partitionedList.get(i), holidayService.getAvailableDate());
+        }
 
 
     }
