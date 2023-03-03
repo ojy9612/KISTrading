@@ -98,10 +98,10 @@ public class TestController {
         List<List<String>> partitionedList = IntStream.range(0, 10)
                 .mapToObj(i -> stockCodeList.subList(i * partitionSize, i == 9 ? stockCodeList.size() : (i + 1) * partitionSize)).toList();
 
-//        stockInfoService.upsertStockInfo(stockCodeList, holidayService.deltaOneAvailableDate(), holidayService.deltaTwoAvailableDate());
 
         for (int i = 0; i < partitionedList.size(); i++) {
             log.info((i + 1) + "번째 시작 / " + 10);
+            stockInfoService.upsertStockInfo(partitionedList.get(i), holidayService.deltaOneAvailableDate(), holidayService.deltaTwoAvailableDate());
             stockPriceService.upsertStockPrice(partitionedList.get(i), holidayService.getAvailableDate());
         }
 
