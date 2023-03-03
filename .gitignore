@@ -39,3 +39,4 @@ out/
 # my
 /src/main/resources/application.yaml
 /mysql/
+/docker-compose.yml
