@@ -1,10 +1,10 @@
 name: Java CI with Gradle
 
 on:
-  pull_request:
-    branches: [ "main" ]  
   push:
-    branches: [ "main" ] 
+    branches: [ main ] 
+  pull_request:
+    branches: [ main ]  
 
 jobs:
   build:
@@ -19,6 +19,17 @@ jobs:
         with:
           java-version: 17
           distribution: adopt
+          
+      ## create application.properties
+      - name: make application.properties
+        if: true # branch가 develop일 때
+        run: |
+          # spring의 resources 경로로 이동
+          cd ./src/main/resources
+          touch ./application.properties
+
+          # GitHub-Actions에서 설정한 값을 application.properties 파일에 쓰기
+          echo "${{ secrets.PROPERTIES }}" > ./application.properties
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
