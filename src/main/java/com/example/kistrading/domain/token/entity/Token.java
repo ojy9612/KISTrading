@@ -2,7 +2,7 @@ package com.example.kistrading.domain.token.entity;
 
 
 import com.example.kistrading.domain.TimeStamped;
-import com.example.kistrading.domain.common.em.TradeMode;
+import com.example.kistrading.domain._common.em.TradeMode;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package com.example.kistrading.domain.stockprice.service;
 
-import com.example.kistrading.domain.common.service.NaverFinanceCrawlerService;
+import com.example.kistrading.domain._common.service.NaverFinanceCrawlerService;
 import com.example.kistrading.domain.stockinfo.entity.StockInfo;
 import com.example.kistrading.domain.stockinfo.service.StockInfoService;
 import com.example.kistrading.domain.stockprice.entity.StockPrice;

@@ -1,4 +1,4 @@
-package com.example.kistrading.domain.common.dto;
+package com.example.kistrading.domain._common.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

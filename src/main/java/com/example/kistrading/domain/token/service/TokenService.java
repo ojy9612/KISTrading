@@ -1,7 +1,7 @@
 package com.example.kistrading.domain.token.service;
 
 import com.example.kistrading.config.PropertiesMapping;
-import com.example.kistrading.domain.common.service.WebClientKISConnector;
+import com.example.kistrading.domain._common.service.WebClientKISConnector;
 import com.example.kistrading.domain.token.entity.Token;
 import com.example.kistrading.domain.token.repository.TokenRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;

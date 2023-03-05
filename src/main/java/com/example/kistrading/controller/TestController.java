@@ -1,11 +1,11 @@
 package com.example.kistrading.controller;
 
 import com.example.kistrading.config.PropertiesMapping;
-import com.example.kistrading.domain.common.em.OrderType;
-import com.example.kistrading.domain.common.service.AssetService;
-import com.example.kistrading.domain.common.service.NaverFinanceCrawlerService;
-import com.example.kistrading.domain.common.service.TradeService;
-import com.example.kistrading.domain.common.service.WebClientKISConnector;
+import com.example.kistrading.domain._common.em.OrderType;
+import com.example.kistrading.domain._common.service.AssetService;
+import com.example.kistrading.domain._common.service.NaverFinanceCrawlerService;
+import com.example.kistrading.domain._common.service.TradeService;
+import com.example.kistrading.domain._common.service.WebClientKISConnector;
 import com.example.kistrading.domain.holiday.service.HolidayService;
 import com.example.kistrading.domain.stockcode.entity.StockCode;
 import com.example.kistrading.domain.stockcode.service.StockCodeService;

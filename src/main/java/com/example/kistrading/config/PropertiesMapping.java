@@ -1,6 +1,6 @@
 package com.example.kistrading.config;
 
-import com.example.kistrading.domain.common.em.TradeMode;
+import com.example.kistrading.domain._common.em.TradeMode;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

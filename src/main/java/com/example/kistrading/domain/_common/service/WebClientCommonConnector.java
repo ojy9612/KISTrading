@@ -1,4 +1,4 @@
-package com.example.kistrading.domain.common.service;
+package com.example.kistrading.domain._common.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,10 +17,11 @@ import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
-public class WebClientDataGoKrConnector<T> {
+public class WebClientCommonConnector<T> {
     private final ObjectMapper objectMapper;
-    @Qualifier("WebClientDataGoKr")
-    private final WebClient webClientDataGoKr;
+
+    @Qualifier("WebClient")
+    private final WebClient webClient;
     
     /**
      * status code 가 200이 아닐 시 webclient 상에서 에러처리를 별도로 할 수 있지만 현재는 그냥 return 하게 해둠.
@@ -42,7 +43,9 @@ public class WebClientDataGoKrConnector<T> {
         try {
             String requestBodyJson = !body.isEmpty() ? objectMapper.writeValueAsString(body) : "";
 
-            ResponseEntity<T> block = webClientDataGoKr.method(methodType)
+            this.wait(1000);
+
+            ResponseEntity<T> block = webClient.method(methodType)
                     .uri(uriBuilder -> uriBuilder
                             .path(uri)
                             .queryParams(params)
@@ -57,6 +60,8 @@ public class WebClientDataGoKrConnector<T> {
 
         } catch (JsonProcessingException e) {
             throw new RuntimeException("json error");
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -73,7 +78,7 @@ public class WebClientDataGoKrConnector<T> {
         try {
             String requestBodyJson = !body.isEmpty() ? objectMapper.writeValueAsString(body) : "";
 
-            return webClientDataGoKr.method(methodType)
+            return webClient.method(methodType)
                     .uri(uriBuilder -> uriBuilder
                             .path(uri)
                             .queryParams(params)
