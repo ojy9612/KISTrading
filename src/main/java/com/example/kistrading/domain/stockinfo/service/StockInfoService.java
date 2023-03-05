@@ -1,7 +1,7 @@
 package com.example.kistrading.domain.stockinfo.service;
 
 import com.example.kistrading.config.PropertiesMapping;
-import com.example.kistrading.domain.common.service.WebClientKISConnector;
+import com.example.kistrading.domain._common.service.WebClientKISConnector;
 import com.example.kistrading.domain.stockcode.entity.StockCode;
 import com.example.kistrading.domain.stockcode.service.StockCodeService;
 import com.example.kistrading.domain.stockinfo.dto.StockInfoPriceResDto;

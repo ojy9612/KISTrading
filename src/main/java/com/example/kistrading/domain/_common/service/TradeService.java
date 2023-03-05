@@ -1,10 +1,10 @@
-package com.example.kistrading.domain.common.service;
+package com.example.kistrading.domain._common.service;
 
 import com.example.kistrading.config.PropertiesMapping;
-import com.example.kistrading.domain.common.em.OrderType;
-import com.example.kistrading.domain.common.em.TradeMode;
+import com.example.kistrading.domain._common.dto.OrderStockResDto;
+import com.example.kistrading.domain._common.em.OrderType;
+import com.example.kistrading.domain._common.em.TradeMode;
 import com.example.kistrading.domain.token.service.TokenService;
-import com.example.kistrading.domain.common.dto.OrderStockResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;

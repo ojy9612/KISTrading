@@ -1,4 +1,4 @@
-package com.example.kistrading.domain.common.service;
+package com.example.kistrading.domain._common.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

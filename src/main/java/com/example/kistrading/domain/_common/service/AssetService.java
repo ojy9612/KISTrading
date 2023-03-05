@@ -1,9 +1,9 @@
-package com.example.kistrading.domain.common.service;
+package com.example.kistrading.domain._common.service;
 
 import com.example.kistrading.config.PropertiesMapping;
-import com.example.kistrading.domain.common.em.TradeMode;
+import com.example.kistrading.domain._common.dto.AccountDataResDto;
+import com.example.kistrading.domain._common.em.TradeMode;
 import com.example.kistrading.domain.token.service.TokenService;
-import com.example.kistrading.domain.common.dto.AccountDataResDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
